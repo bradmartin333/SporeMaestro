@@ -1,1 +1,52 @@
-{"tree":{"title":"Root","children":[{"title":"Test note one","x":80,"y":60,"width":150,"height":50,"color":{"h":50,"s":100,"l":50},"children":[],"id":3},{"title":"Test note goo","x":130,"y":140,"width":150,"height":50,"color":{"h":10,"s":100,"l":50},"children":[],"id":1,"lines":[],"pinned":0}],"id":2},"view":{"2":{"x":0,"y":0,"s":1,"open":true},"sidebarLeft":{"size":200,"open":false},"sidebarRight":{"size":200,"open":false}}}
+{
+  "tree": {
+    "title": "Root",
+    "children": [
+      {
+        "id": 4,
+        "title": "Hardware\n",
+        "x": 170,
+        "y": 118,
+        "width": 200,
+        "height": 50,
+        "color": {
+          "h": 180,
+          "s": 100,
+          "l": 62.96208591373526
+        },
+        "children": []
+      },
+      {
+        "id": 5,
+        "title": "Microscope",
+        "x": 409.34729483210265,
+        "y": 259.85719341129334,
+        "width": 200,
+        "height": 50,
+        "color": {
+          "h": 91.09755514300444,
+          "s": 100,
+          "l": 50
+        },
+        "children": []
+      }
+    ],
+    "id": 2
+  },
+  "view": {
+    "2": {
+      "x": 273.9953524980667,
+      "y": 70.64182368749277,
+      "s": 0.7943282347242816,
+      "open": true
+    },
+    "sidebarLeft": {
+      "size": 200,
+      "open": false
+    },
+    "sidebarRight": {
+      "size": 200,
+      "open": false
+    }
+  }
+}

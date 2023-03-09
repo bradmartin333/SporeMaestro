@@ -388,31 +388,7 @@ details>p{display:inline-block;}
 
 
 <script>
-testtree = {title:"Root", children:[
-  {
-    title: "Test note one",
-    x: 80,
-    y: 60,
-    width: 150,
-    height: 50,
-    color: {h: 50, s:100, l:50},
-    children: []
-  },
-  {
-    title: "Test note two",
-    x: 130,
-    y: 140,
-    width: 150,
-    height: 50,
-    color: {h: 10, s:100, l:50},
-    children: [],
-
-    // optional properties:
-    id:1,
-    lines:[],
-    pinned: 0,
-  }
-]}
+testtree = {title:"Root", children:[]}
 
 var level;
 var canvas=document.getElementById('canvas')
@@ -453,7 +429,7 @@ if (localStorage.view) viewById=JSON.parse(localStorage.view);
 
 if (!window.tree){
   tree=testtree;
-  localStorage.tree = JSON.stringify(tree)
+  localStorage.tree = JSON.stringify(tree,null,2);
   delete localStorage.view;
 }
 
@@ -468,7 +444,7 @@ async function loadTree() {
   let fileData = await fetch('./tree.json');
   let jsonData = await fileData.json();
   lastStorage = localStorage.tree;
-  localStorage.tree = JSON.stringify(jsonData.tree);
+  localStorage.tree = JSON.stringify(jsonData.tree,null,2);
   if (lastStorage != localStorage.tree) {
     location.reload();
   }
@@ -1733,11 +1709,11 @@ function populateActivity(){
 }
 function save(){
   populateActivity()
-  localStorage.tree=JSON.stringify(tree)
+  localStorage.tree=JSON.stringify(tree,null,2);
 }
 function saveView(){
   viewById[level.id]=view
-  localStorage.view=JSON.stringify(viewById)
+  localStorage.view=JSON.stringify(viewById,null,2);
 }
 function deltaPush(actions){
   if (readonly) return;
@@ -2094,7 +2070,7 @@ function setPenTool(newTool){
   else document.oncontextmenu=null;
 }
 function downloadJson(){
-  let blob = new Blob([JSON.stringify({tree,view:viewById})], {type: "application/json"})
+  let blob = new Blob([JSON.stringify({tree,view:viewById},null,2)], {type: "application/json"})
   let url = URL.createObjectURL(blob)
   let a = document.createElement('a')
   a.href=url
