@@ -1,0 +1,2538 @@
+<!doctype html><meta charset=utf-8><meta name=viewport content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel=icon>
+<style>
+h3,h2,h1{margin:0;display:inline-block}
+body{
+  font-family:sans-serif;
+  transition:background-color 0.3s;
+  user-select:none;
+  overflow:hidden;
+  touch-action:none;
+}
+pre{background:rgba(128,128,128,0.2)}
+.note{
+  cursor:auto;
+  position:absolute;
+  border:2px solid;
+  border-radius:3px;
+  opacity:0.9; box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  min-height:50px; min-width:50px;
+  resize:both; overflow:hidden;
+}
+.note.pinned {box-shadow:1px 1px 2px rgba(0,0,0,0.3);resize:none;}
+.note.selected {outline:2px dashed;}
+.note svg{z-index:-1;}
+.note svg g{filter:blur(2px);}
+.note img{max-width:100%}
+.note .note{
+  filter:brightness(1.5) saturate(0.5) blur(2px);
+  pointer-events: none;
+  box-shadow: 15px 15px 15px rgba(0,0,0,0.4);
+}
+textarea{min-width:42px;min-height:42px}
+ul{margin:0}
+.gear{
+  cursor:pointer;
+  position:absolute; right:0;
+  width:13px; height:13px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAOtJREFUeNp8kj0LwkAMhtterau26uCgIPixOIiTf91fIeiiIo6C2joIFj/rG3kPwlE8eOglby6X5Gq88jUCMxCAsysG/PpgABL6OvR3aCfUfRssa0inrBcIVWJtb8Da3pSpoNCpRtupdojxBgbcwYqJYjAGEfVfcsOmJ6DCBAtwYFlXkIM2e+tKnNzUd8q5/LGrEi+nd+CphNg5VFd7idtJeSewBz013pwBLfZk2NMcHEOVzagSpiUPLnpNhmZH3lDixwnWdtNT2TM+9BYsOSXRHiwpZcnyuIU9VPAfu3EfcSDS65H+MzXvK8AAT5g1PwYr5mUAAAAASUVORK5CYII=)
+}
+.note.hl{box-shadow: inset 0px 0px 50px white, 5px 5px 5px rgba(0,0,0,0.3) !important; opacity:0.5}
+.invis{box-shadow:none; border-color:transparent; resize:none;}
+.invis:hover{border-color:rgba(128,128,128,0.2);background:rgba(128,128,128,0.1); resize:both;}
+.invis .gear{display:none;}
+.invis:hover .gear{display:block}
+.invis.pinned{box-shadow:none}
+.invis.pinned:hover{border-color:transparent;resize:none;}
+#menu{
+  display:none;
+  position:absolute;
+  z-index:2;
+  background:#eee;
+  border:3px solid #ccc;
+  border-radius:3px;
+  box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  min-width:200px
+}
+#menu p{margin:7px}
+#canvas{
+  position:absolute;
+  top:0;left:0;
+  height:100%;
+}
+#main{
+  transform-origin: 0% 0%;
+  position:absolute;
+  top:0;left:0;
+  margin:0;
+  transition:opacity 0.3s;
+}
+#main.panning>div.note{
+  cursor:inherit;
+}
+#trail{
+  position:absolute;
+  background:rgba(128,128,128,0.3);
+  width:100%;
+  height:32px;
+  left:0;top:0;
+  overflow:hidden;
+  white-space:nowrap;
+  direction:rtl;
+  text-align:left;
+}
+#trail a{
+  direction:ltr;
+  color:#000; text-decoration:none;
+  display:inline-block;
+  padding:3px;
+  border:2px solid red;
+  border-radius:3px;
+  margin:2px;
+}
+#trail a:hover{opacity:0.6}
+#trail a.drop {border:2px dashed;opacity:0.5}
+svg{position:absolute;left:0;top:0;transition:opacity 0.3s;transform-origin:0 0}
+#outline {
+  padding:10px;
+  position:absolute;
+  left:0;
+  top:22px;
+  width:calc(100% - 28px);
+  height:calc(100% - 42px);
+  overflow:auto;
+  line-height:23px;
+  scroll-behavior:smooth;
+}
+#outline a{
+  color:black;
+  text-decoration:none;
+  white-space: nowrap;
+  padding:2px;
+  opacity:0.8;
+}
+#outline a:hover{opacity:1}
+#outline a.drop {outline:1px dashed black;opacity:0.5}
+.outline-hl::before{
+  content:'';
+  position:absolute;
+  z-index:-9999;
+  left:0;
+  height:21px;
+  width:calc(100% - 2px);
+  background:#eee;
+  border:1px solid #eee;
+}
+.outline-hl2::before{
+  content:'';
+  position:absolute;
+  z-index:-9999;
+  left:0;
+  height:21px;
+  width:calc(100% - 2px);
+  border:1px dotted black;
+  background:#cdf;
+}
+summary.outline-hl2::before{
+  height:22px;
+}
+summary:hover::marker{
+  color:#08f;
+}
+details p{
+  white-space:nowrap;
+  margin:0 0 0 15px;
+}
+details>p{display:inline-block;}
+.sresult{opacity:0.1 !important;}
+.sidebar{
+  background:rgba(255,255,255,0.9);
+  position:absolute;
+  z-index:2;
+  top:32px;
+  width:200px;
+  height:calc(100% - 32px);
+}
+.sidebarAdj{
+  cursor:ew-resize;
+  width:8px;
+  height:100%;
+  background:#999;
+  position:absolute;
+  top:0;
+}
+.sidebarAdj:hover{background:#aaa}
+#sidebarLeft{left:-200px}
+#sidebarLeftAdj{right:0}
+#sidebarRight{right:0 /* -200px */ }
+#sidebarRightAdj{left:0}
+#searchInput{
+  position:absolute;
+  top:0;
+  left:0;
+  width:calc(100% - 8px);
+  height:22px;
+}
+#activity { 
+  position:absolute;
+  left:8px;
+  top:0px;
+  width:calc(100% - 9px);
+  height:100%;
+  overflow:auto;
+  scroll-behavior:smooth;
+}
+.action{
+  padding:5px;
+  border:5px solid #ccc;
+}
+.action:hover{
+  background:#ddd;
+  border-color:#bbb
+}
+.redo{opacity:0.3}
+#toolbar {
+  position:absolute;
+  z-index:2;
+  top:32px;left:0;
+  width:32px;
+  background:rgba(128,128,128,0.3);
+  max-height:calc(100% - 32px);
+  overflow-y:auto;
+  scrollbar-width:none;
+}
+#toolbar::-webkit-scrollbar{display:none;}
+#toolbox {width:32px;}
+.tool {
+  width:28px;
+  height:28px;
+  background-color: #ddd;
+  background-repeat: no-repeat;
+  background-position:0 0;
+  border: 2px outset;
+  margin:2px;
+}
+.tool.active, .tool:active{
+  border: 2px inset;
+  background-color: #bbb;
+  background-position:1px 1px;
+}
+#drawingControls{
+  position:absolute;
+  padding:12px;
+  border-radius:0 10px 10px 0;
+  background:rgba(212,212,212,0.8);
+  width:280px;
+  left:-280px;
+  top:174px;
+  opacity:0;
+  transition:0.2s;
+}
+#drawingControls.open{
+  left:32px;
+  opacity:1;
+}
+#drawingControls input{vertical-align: middle;}
+#drawingControls label{
+  display:inline-block;
+  width:100px;
+  text-align:right;
+  margin-right:5px;
+  line-height:32px;
+}
+#help {
+  display:none;
+  position:fixed;
+  z-index:99;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.7);
+}
+#help div{
+  margin:10vh auto;
+  width:810px;
+  height:76vh;
+  background:white;
+  padding:2vh 2vw;
+  overflow:auto;
+  user-select:text;
+}
+@media(max-width:900px) {
+  #help div{width:90vw;}
+}
+#help table{margin:auto}
+#help tr:hover{background:#eee}
+#help td{padding:2px 15px}
+#marquee{
+  display:none;
+  position:absolute;
+  border:2px dashed;
+  cursor:crosshair;
+}
+</style>
+<div id=canvas>
+<svg><g></g></svg>
+<div id=main></div>
+
+
+
+<div id=drawingControls>
+<div style='float:right'><a href=# title=Close onclick='toggleMoreControls();return false;'>X</a></div>
+<div><label>color:</label><input id=pencolor type=color oninput='penColor=this.value'></div>
+<div><label>thickness:</label><input id=penwidth type=range oninput='penWidth=this.value+"px"' min=1 max=10 value=3></div>
+<div><label>arrow style:</label>
+ <select id=arrowstyle oninput='arrowStyle=this.value; setPenTool("arrow")'>
+  <option value='1'>⯈</option>
+  <option value='2'>➤</option>
+  <option value='3' selected>ᐅ</option>
+  <option value='4'>⮚</option>
+  <option value='5'>ᐳ</option>
+ </select>
+</div>
+<div><label>arrow size:</label><input id=arrowsize type=range oninput='arrowSize=this.value/50; setPenTool("arrow")' min=3 max=10 value=6></div>
+ <a href='#' onclick='eraseAllLines(); return false'>erase all lines</a>
+</div>
+
+<div id=toolbar>
+<div id=toolbox></div>
+</div>
+</div>
+
+<div id=marquee></div>
+
+<div id=menu>
+  <p class=ro-disable>Change color <input id=notecolor type=color onchange='changeColor()'><br>(use black for transparent)
+  <p><a href='#' class=ro-disable onclick='editNote(); return false'>Edit</a>
+  <p><a href='#' class=ro-disable onclick='menuAction({action:"toggleStrike"}); return false'>Toggle strikethrough</a>
+  <p><a href='#' class=ro-disable onclick='menuAction({action:"togglePinned"}); return false'>Toggle pinned</a>
+  <p><a href='#' onclick='jumpInto(); return false' id=jumpInto>Jump Into</a>
+  <p><a href='#' class=ro-disable onclick='moveUpNote(); return false'>Move up a level</a>
+  <p><a href='#' class=ro-disable onclick='menuAction({action:"deleteNote"}); return false'>Delete</a>
+</div>
+
+<div id=trail></div>
+<div class=sidebar id=sidebarLeft>
+ <div id=outline></div>
+ <form onsubmit="jumpFirstSearch(); return false">
+  <input id=searchInput type=search placeholder=Search oninput="search(this)" tabindex=1>
+ </form><br>
+ <div class=sidebarAdj id=sidebarLeftAdj></div>
+</div>
+
+<div class=sidebar  id=sidebarRight>
+ <div id=activity></div>
+ <div class=sidebarAdj id=sidebarRightAdj></div>
+</div>
+
+<div id=help onclick='if (event.target==this) closeHelp();'>
+<div>
+<p>Click and drag to move note
+<p>Drag corners to resize
+<p>Right click note body to expand, double click to edit text
+<p>Middle-click drag to pan, scroll to zoom
+<p><b>Drawing tools</b>: Left click drag on background to draw, right click erase
+<p><b>Sidebar</b>: drag &amp; drop a note onto another to move it. Shift+click a link to jump to the parent note.
+<p><b>Search</b>: Enter to jump to result, shift+Enter to search backwards, Esc to defocus
+<p><a href=# onclick='downloadJson(); return false'>Download the current state</a>, drag & drop .json file onto this page to load
+<p><a href='#' class=ro-disable onclick='if (confirm("reset?")){localStorage.tree="";localStorage.view="";location.hash="";location.reload()} else return false'>Delete everything and reset</a>
+
+<p>Keyboard shortcuts:
+<table>
+<tr><td>Arrow keys</td><td>pan</td></tr>
+<tr><td>- or PageDown</td><td>zoom out</td></tr>
+<tr><td>+ or PageUp</td><td>zoom in</td></tr>
+<tr><td>Home</td><td>zoom 100%</td></tr>
+<tr><td>End</td><td>zoom to fit</td></tr>
+<tr><td>T</td><td>Add-Note tool</td></tr>
+<tr><td>M</td><td>Marquee tool</td></tr>
+<tr><td>B</td><td>Pencil tool</td></tr>
+<tr><td>L</td><td>Draw Line tool</td></tr>
+<tr><td>A</td><td>Draw Arrow tool</td></tr>
+<tr><td>R</td><td>Draw Rectangle tool</td></tr>
+<tr><td>E</td><td>Eraser tool</td></tr>
+<tr><td>H</td><td>Hand tool</td></tr>
+<tr><td>Z</td><td>Zoom tool</td></tr>
+<tr><td>S</td><td>Toggle sidebar</td></tr>
+<tr><td>Q</td><td>Toggle extra drawing controls</td></tr>
+<tr><td>/</td><td>Focus Search</td></tr>
+<tr><td>Delete</td><td>Delete marquee selection</td></tr>
+<tr><td>Escape</td><td>Unequip tool</td></tr>
+<tr><td>Ctrl + Z</td><td>Undo</td></tr>
+<tr><td>Ctrl + Y<br>(or Ctrl+Shift+Z)</td><td>Redo</td></tr>
+<tr><td>Ctrl + A</td><td>Select All</td></tr>
+</table>
+
+<p>Supported markdown:
+<table style='font-family:courier, monospace'>
+<tr><td>Headings</td><td>### H1<br> ## H2<br> # H3<br> </td></tr>
+<tr><td>Bold</td><td>*text*</td></tr>
+<tr><td>Italic</td><td>_text_</td></tr>
+<tr><td>Strikethrough</td><td>~text~</td></tr>
+<tr><td>Inline code</td><td>`code`</td></tr>
+<tr><td>Code block</td><td>```code```</td></tr>
+<tr><td>Hyperlink</td><td>[title](https://www.example.com)</td></tr>
+<tr><td>Images</td><td>![alt text](image.jpg)</td></tr>
+<tr><td>Ordered list</td><td>1. First item<br>2. Second item<br>3. Third item</td></tr>
+<tr><td>Unordered list</td><td>- First item<br>- Second item<br>- Third item</td></tr>
+<tr><td colspan=2>Lists can be nested<br><b>Double-click</b> a list marker to strike out that list item</td></tr>
+<tr><td></td><td></td></tr>
+</table>
+
+<p><a href=# onclick='closeHelp(); return false'>Close</a>
+</div>
+</div>
+
+<canvas id=favicanvas width=16 height=16 style='display:none'></canvas>
+
+
+<script>
+testtree = {title:"Root", children:[
+  {
+    title: "Test note one",
+    x: 80,
+    y: 60,
+    width: 150,
+    height: 50,
+    color: {h: 50, s:100, l:50},
+    children: []
+  },
+  {
+    title: "Test note two",
+    x: 130,
+    y: 140,
+    width: 150,
+    height: 50,
+    color: {h: 10, s:100, l:50},
+    children: [],
+
+    // optional properties:
+    id:1,
+    lines:[],
+    pinned: 0,
+  }
+]}
+
+var level;
+var canvas=document.getElementById('canvas')
+var menu=document.getElementById('menu')
+var main=document.getElementById('main')
+var trail=document.getElementById('trail')
+var outline=document.getElementById('outline')
+var activity=document.getElementById('activity')
+var sidebarLeft=document.getElementById('sidebarLeft')
+var sidebarLeftAdj=document.getElementById('sidebarLeftAdj')
+var sidebarRight=document.getElementById('sidebarRight')
+var sidebarRightAdj=document.getElementById('sidebarRightAdj')
+var searchInput=document.getElementById('searchInput')
+var help=document.getElementById('help')
+var toolbox=document.getElementById('toolbox')
+var marquee=document.getElementById('marquee')
+var favicon=document.querySelector("link[rel=icon]")
+var favicanvas=document.getElementById('favicanvas')
+var favictx=favicanvas.getContext('2d')
+var selection={elements:[],objects:[]};
+var trailobj=[]
+var menuRef=null;
+var menuRefElement=null;
+var zTopIndex = 0;
+var penSmooth = 0.15;
+var offsetLeft = 0;
+var offsetRight = 0;
+var textEditing=false;
+var deltaHistory=[], redoHistory=[];
+var view, viewById={};
+var readonly = false;
+
+var enterNoteEvent = "oncontextmenu"
+var editNoteEvent = "ondblclick"
+
+if (localStorage.tree) tree=JSON.parse(localStorage.tree);
+if (localStorage.view) viewById=JSON.parse(localStorage.view);
+
+if (!window.tree){
+  tree=testtree;
+  localStorage.tree = JSON.stringify(tree)
+  delete localStorage.view;
+}
+
+window.onstorage=(e)=>{
+  if (e.key=='tree') {
+    tree=JSON.parse(localStorage.tree); 
+    reloadAll()
+  }
+}
+
+function openHelp(){
+  help.style.display='block'
+}
+function closeHelp(){
+  help.style.display='none'
+}
+function setOffsetLeft(ol){
+  if (ol<32) ol=32
+  viewById.sidebarLeft.size=offsetLeft=ol;
+  ol+='px';
+  canvas.style.left=ol;
+  sidebarLeft.style.width=ol
+}
+function setOffsetRight(ol){
+  if (ol<32) ol=32
+  viewById.sidebarRight.size=offsetRight=ol;
+  sidebarRight.style.width=ol+'px'
+}
+function toggleSidebarLeft(){
+  canvas.style.transition='0.2s'
+  sidebarLeft.style.transition='left 0.2s'
+
+  if (offsetLeft) {
+    viewById.sidebarLeft.open=false
+    sidebarLeft.style.left=-offsetLeft + "px"
+    canvas.style.left="0px"
+    offsetLeft = 0;
+    toolButtons.sidebar.classList.remove('active')
+  } else {
+    viewById.sidebarLeft.open=true
+    offsetLeft=viewById.sidebarLeft.size
+    sidebarLeft.style.visibility="visible"
+    sidebarLeft.style.left="0px"
+    canvas.style.left=offsetLeft+'px'
+    toolButtons.sidebar.classList.add('active')
+  }
+  saveView()
+
+  setTimeout(function(){
+    sidebarLeft.style.visibility=offsetLeft?"visible":"hidden"
+    canvas.style.transition=''
+    sidebarLeft.style.transition=''
+  },200)
+}
+function toggleSidebarRight(){
+  sidebarRight.style.transition='right 0.2s'
+
+  if (offsetRight) {
+    viewById.sidebarRight.open=false
+    sidebarRight.style.right=-offsetRight + "px"
+    offsetRight = 0;
+    toolButtons.history.classList.remove('active')
+  } else {
+    viewById.sidebarRight.open=true
+    offsetRight=viewById.sidebarRight.size
+    sidebarRight.style.visibility="visible"
+    sidebarRight.style.right="0px"
+    toolButtons.history.classList.add('active')
+  }
+  saveView()
+
+  setTimeout(function(){
+    sidebarRight.style.visibility=offsetRight?"visible":"hidden"
+    sidebarRight.style.transition=''
+  },200)
+}
+function toggleMoreControls(){
+  if (readonly) return;
+  document.getElementById('drawingControls').classList.toggle("open")
+  toolButtons.gear.classList.toggle('active')
+}
+function setReadOnly(){
+  readonly=true
+
+  for (let i of document.getElementsByClassName('ro-disable'))
+    i.style.display='none'
+
+  // todo: if we are in the middle of an action, e.g. drawing a line / moving a note / editing text, terminate it safely
+
+  setPenTool('none')
+
+  document.getElementById('drawingControls').classList.remove("open")
+  toolButtons.gear.classList.remove('active')
+}
+function unsetReadOnly(){
+  readonly=false
+
+  for (let i of document.getElementsByClassName('ro-disable'))
+    i.style.display=''
+}
+function changeColor(){
+  let c = hex2hsl(document.getElementById('notecolor').value);
+  menuAction({action:"setColor", color:c})
+}
+function menuAction(a, action=[]){
+  menu.style.display='none';
+  if (selection.objects.length) {
+    for (let n of selection.objects) {
+      action.push(Object.assign({id:n.id}, a))
+    }
+    if (a.action=="togglePinned") clearSelection()
+  } else {
+    action.push(Object.assign({id:menuRef.id},a))
+  }
+  deltaPush(action)
+}
+function moveUpNote(){
+  menu.style.display='none';
+  let action=[];
+  if (trailobj.length<=1) {
+    if (!confirm("Create new note above root?")) return;
+    action.push({action:"newRoot", id:tree.id})
+  }
+
+  menuAction({action:"setParent", parent:-1, animate:1}, action)
+}
+function editNote(){
+  menu.style.display='none';
+  menuRefElement[editNoteEvent]()
+}
+function jumpInto(){
+  menu.style.display='none';
+  menuRefElement[enterNoteEvent]()
+}
+function eraseAllLines(){
+  if (!level.lines) return;
+  deltaPush([{action:"eraseAllLines", id:level.id}])
+}
+function killEvent(e){e.preventDefault();e.stopPropagation()}
+function backgroundKillEvent(e){
+  if (background(e.target)) {e.preventDefault();e.stopPropagation()}
+}
+function setNoteColor(n,d) {
+  if (n.color.l==0){
+    d.classList.add("invis")
+    d.style.backgroundColor=""
+    d.style.borderColor=""
+  } else {
+    d.classList.remove("invis")
+    d.style.backgroundColor='hsl('+n.color.h+','+n.color.s+'%,'+n.color.l+'%)';
+    d.style.borderColor='hsl('+n.color.h+','+n.color.s+'%,'+(n.color.l*0.8)+'%)';
+  }
+}
+function setNoteLayout(n,d){
+  d.style.width=n.width+'px'
+  d.style.height=n.height+'px'
+  d.style.left=n.x+'px'
+  d.style.top=n.y+'px'
+}
+function createNote(n, editImmediately=false, index=-1){
+  var d = document.createElement('div');
+  d.className='note'
+  
+  setNoteColor(n,d)
+  setNoteLayout(n,d)
+  if (n.pinned) d.classList.add("pinned")
+  {
+    let si = selection.objects.indexOf(n)
+    if (si!=-1) {
+      selection.elements[si]=d
+      d.classList.add('selected')
+    }
+  }
+
+  var a = document.createElement('div');
+  a.className='gear'
+  a.onclick=function(e){
+    e.stopPropagation(); e.preventDefault()
+    if (e.clientX>window.innerWidth-220){
+      menu.style.left=''
+      menu.style.right=window.innerWidth-e.pageX +'px'
+    } else {
+      menu.style.left=e.pageX+'px'
+      menu.style.right=''
+    }
+    if (e.clientY>window.innerHeight-220){
+      menu.style.top=''
+      menu.style.bottom=window.innerHeight-e.pageY +'px'
+    } else {
+      menu.style.top=e.pageY+'px'
+      menu.style.bottom=''
+    }
+    
+    menu.style.display='block'
+    document.getElementById('notecolor').value=hsl2rgb(n.color.h,n.color.s,n.color.l)
+    document.getElementById('jumpInto').href='#'+n.id;
+    menuRef=n;
+    menuRefElement=d;
+  }
+  a[editNoteEvent]=killEvent;
+  d.appendChild(a)
+
+  var t = document.createElement('div');
+  t.innerHTML=markdown(n.title)
+  d.appendChild(t)
+
+  d[editNoteEvent]=function(ev){
+    if (readonly) return;
+    if (ev){
+      if (ev.target.tagName=='TEXTAREA') return;
+      if (ev.target.tagName=='LI' && ev.clientX < ev.target.getBoundingClientRect().x) {
+        let [i,j]=ev.target.dataset.i.split(',')
+        deltaPush([{action:"toggleBulletStrike", id:n.id, i,j}])
+        return
+      }
+    }
+    if (ev) killEvent(ev)
+    
+    var e = document.createElement('textarea');
+    var sw = (n.width-8)+'px', sh=(n.height-8)+'px';
+    var saved=false;
+    function saveText(){
+      if (saved) return;
+      saved=true;
+      let a=[]
+      if (e.value!=n.title)
+        a.push({action:"setTitle", id:n.id, title:e.value})
+      else
+        t.innerHTML=markdown(n.title)
+      if (e.style.width!=sw || e.style.height!=sh)
+        a.push({
+          action:"setLayout", id:n.id, x:n.x,y:n.y, 
+          width:parseFloat(e.style.width)+8,
+          height:parseFloat(e.style.height)+8
+        })
+      if (a.length) deltaPush(a)
+
+      d.style.overflow='';
+      setTimeout(()=>textEditing=false,100)
+    }
+
+    e.textContent = n.title
+    e.style.width = sw
+    e.style.height = sh
+    e.style.background = n.color.l==0?'transparent':'hsl('+n.color.h+','+n.color.s+'%,'+n.color.l*1.2+'%)';
+    t.innerHTML = "";
+    d.style.overflow='visible'
+    t.appendChild(e);
+    textEditing=true;
+
+    e.focus()
+    if (n.title=="New note") e.select()
+    e.onblur=saveText;
+    e.onkeydown=function(e){
+      e.stopPropagation()
+      if (((e.keyCode==13 || e.keyCode==10) && e.ctrlKey) || e.keyCode==27)
+        saveText();
+    }
+  }
+
+  d[enterNoteEvent] = function(e){
+    if (document.onmouseup!=null) return false;
+    if (e && e.target.tagName=='TEXTAREA') return;
+    d.style.transition="0.3s linear"
+    
+    d.style.left=(window.innerWidth -n.width )/2 + 'px'
+    d.style.top=(window.innerHeight -n.height)/2  + 'px'
+    d.style.transform="scale("+(window.innerWidth/n.width)*1.2+")"
+    d.style.zIndex=++zTopIndex;
+    main.style.opacity='0'
+    mainSvg.style.opacity='0'
+    menu.style.display='none'
+    document.body.style.backgroundColor='';
+    d.onmousedown=null
+    d[editNoteEvent]=null
+    d[enterNoteEvent]=null
+
+    setTimeout(()=>{
+      main.style.opacity=''
+      mainSvg.style.opacity=''
+      trailobj.push(n)
+      regenTrail()
+      populate(n)
+    },300)
+
+    return false;
+  }
+
+  d.onmousedown=function(e){
+    if (readonly || e.target.tagName=="TEXTAREA" || e.button!=0 || n.pinned || penTool=="zoom" || penTool=="hand") return;
+    var sw = d.style.width, sh = d.style.height;
+    d.style.zIndex = ++zTopIndex
+
+    var targets=selection;
+    if (!selection.elements.includes(d)) {
+      clearSelection();
+      targets={elements:[d],objects:[n]}
+    }
+
+    var startx=n.x, starty=n.y;
+    var [sx, sy] = mousePos(e);
+    let dx=0,dy=0;
+    let suppressJump = mostOverlapping(n, targets, dx, dy)[1]>0;
+    let firstMoveEvent=true, resizing=false;
+
+    d.style.cursor='move'
+
+    document.onmousemove=function(e){
+      // We cannot detect a resize before the first move event, so skip it entirely.
+      if (firstMoveEvent) {
+        firstMoveEvent=false;
+        return
+      }
+      if (resizing || d.style.width!=sw || d.style.height!=sh) {
+        resizing=true
+        return;
+      }
+
+      let [mx, my] = mousePos(e);
+      dx = mx - sx;
+      dy = my - sy;
+
+      for (let i=0; i<targets.elements.length; i++) {
+        let n=targets.objects[i], d=targets.elements[i];
+        d.style.left = (n.x+dx) +'px'
+        d.style.top  = (n.y+dy) +'px'
+      }
+      let [m, ma] = mostOverlapping(n, targets, dx, dy);
+      for (let i of main.children){ i.classList.remove('hl')}
+      if (ma>0) {
+        if (!suppressJump) main.children[m].classList.add('hl');
+      } else suppressJump=false;
+    }
+    document.onmouseup=function(){
+      document.onmouseup=null;
+      document.onmousemove=null;
+      d.style.cursor='';
+
+      if (resizing) {
+        deltaPush([{ action:"setLayout", id:n.id, 
+          x:n.x,
+          y:n.y,
+          width:parseFloat(d.style.width),
+          height:parseFloat(d.style.height),
+          skipDom:true
+        }])
+        return
+      }
+      
+      let [m, ma] = mostOverlapping(n, targets, dx, dy);
+      if (ma>0 && !suppressJump) {
+        let p = targets.elements.length>1?"group":'"'+shortTitle(n.title)+'"';
+        let target = level.children[m];
+
+        if (confirm('Move '+p+' into "'+shortTitle(target.title)+'"?')) {
+          openViewIfEmpty(target)
+          let action=[]
+
+          for (let i=0; i<targets.elements.length; i++) {
+            let n = targets.objects[i], d = targets.elements[i];
+
+            action.push({
+              action:"setParent",
+              id:n.id,
+              parent:target.id,
+              animate:1,
+            })
+          }
+          deltaPush(action)
+          return
+        } else {
+          suppressJump = true;
+          main.children[m].classList.remove('hl')
+        }
+      }
+
+      if (dx!=0 || dy!=0) {
+        let action=[]
+        for (let i=0; i<targets.elements.length; i++) {
+          let n=targets.objects[i], d=targets.elements[i];
+          action.push({action:"setLayout", id:n.id,
+            x:n.x+dx,
+            y:n.y+dy,
+            width:n.width,
+            height:n.height,
+            skipDom:true
+          })
+        }
+        deltaPush(action)
+      }
+    }
+  }
+
+  d.onmouseover=function(e){
+    if (e.buttons==2 && penTool=="addnote" && n.title=="New note") {
+      deltaPush([{action:"deleteNote",id:n.id}])
+    }
+  }
+
+  let bound = {w:window.innerWidth,h:window.innerHeight}
+  let v = viewById[n.id] || {x:0,y:0,s:1};
+
+  let scale = Math.min(0.9*n.width/bound.w, 0.9*n.height/bound.h) || 0.1;
+  let tr = `scale(${scale}) translate(${v.x}px, ${v.y}px) scale(${v.s})`
+
+  {
+    let container = document.createElement("div")
+    let svg = document.createElementNS(svgNS, "svg");
+    let g = document.createElementNS(svgNS, "g");
+    setSVGsize(svg,bound.w*scale,bound.h*scale)
+    if (n.lines) for (let line of n.lines) addSVGline(g, line)
+    g.style.transform=tr  
+    svg.appendChild(g)
+    container.appendChild(svg)
+    container.style.position='absolute'
+    container.style.left='0'
+    container.style.bottom=bound.h*scale+'px'
+    d.appendChild(container)
+    subNoteSvgById[n.id]=g
+  }
+  {
+    let container = document.createElement("div")
+    container.style.transform=tr
+    container.style.position='absolute'
+    container.style.left='0'
+    container.style.bottom=bound.h*scale+'px'
+    container.style.zIndex='-1'
+    for (let i of n.children) {
+      container.appendChild(createSubNote(i))
+    }
+    d.appendChild(container)
+    noteElementsById[n.id]=d;
+  }
+
+  if (index!=-1){
+    main.insertBefore(d, main.children[index])
+  }else{
+    main.appendChild(d)
+  }
+  if (editImmediately) d[editNoteEvent]()
+}
+function createSubNote(i) {
+  let sn = document.createElement('div')
+  sn.className='note'
+
+  setNoteColor(i,sn)
+  setNoteLayout(i,sn)
+  sn.innerHTML=markdown(i.title)
+
+  subNoteById[i.id]=sn
+  return sn
+}
+function zoomReset(){
+  view={x:0,y:0,s:1}
+  setView()
+  saveView()
+}
+function zoomFit(){
+  if (level.children.length==0 && (!level.lines || level.lines.length==0) ) return;
+
+  let maxx=-Infinity, maxy=-Infinity, minx=Infinity, miny=Infinity;
+  for (let c of level.children) {
+    if (c.x<minx) minx=c.x;
+    if (c.y<miny) miny=c.y;
+    if (c.x+c.width > maxx) maxx=c.x+c.width;
+    if (c.y+c.height > maxy) maxy=c.y+c.height;
+  }
+  if (level.lines) for (let line of level.lines) {
+    for (let p of line.points) {
+    if (p[0]<minx) minx=p[0];
+    if (p[1]<miny) miny=p[1];
+    if (p[0]>maxx) maxx=p[0];
+    if (p[1]>maxy) maxy=p[1];
+    }
+  }
+  // margins
+  maxx += 10
+  maxy += 10
+  minx -= 5
+  miny -= 5
+
+  let ww= window.innerWidth-offsetLeft-offsetRight -32,
+      wh= window.innerHeight -32;
+
+  let s1= ww/(maxx-minx),
+      s2= wh/(maxy-miny);
+  if (s1<s2){
+    view.s = s1
+    view.x = 32-minx*s1
+    view.y = 32-miny*s1 + (wh-(maxy-miny)*s1)/2
+  } else {
+    view.s = s2
+    view.y = 32-miny*s2
+    view.x = 32-minx*s2 + (ww-(maxx-minx)*s2)/2
+  }
+  setView()
+  saveView()
+}
+function setView(){
+  if (!view) view={x:0,y:0,s:1}
+  mainSvgG.style.transform = 
+  main.style.transform=`translate(${view.x}px, ${view.y}px) scale(${view.s})`
+}
+function initView(n){
+  if (!viewById[n.id]) viewById[n.id]={x:0,y:0,s:1}
+}
+function openViewIfEmpty(n){
+  if (n.children.length==0) {
+    initView(n)
+    viewById[n.id].open=true;
+  }
+}
+function mousePos(e) {
+  return [
+    (e.pageX-view.x-offsetLeft)/view.s,
+    (e.pageY-view.y           )/view.s ]
+}
+function removeAllChildNodes(a){
+  while (a.children.length)
+    a.removeChild(a.lastChild)
+}
+function setBackgroundColor(t){
+  document.body.style.backgroundColor= t.color? 'hsl('+t.color.h+','+t.color.s+'%,'+(t.color.l*0.3+70)+'%)' : '#fff';
+}
+function updateFavicon(){
+  favictx.fillStyle=document.body.style.backgroundColor;
+  favictx.fillRect(0,0,16,16)
+
+  let s = Math.min(16/window.innerWidth,16/window.innerHeight);
+
+  for (let n of level.children) {
+    favictx.fillStyle='hsl('+n.color.h+','+n.color.s+'%,'+n.color.l+'%)';
+    favictx.fillRect(n.x*s,n.y*s,n.width*s,n.height*s)
+  }
+  favicon.href=favicanvas.toDataURL()
+}
+function populate(t){
+  if (window.location.hash!='#'+t.id)
+    window.history.pushState({},'','#'+t.id) //or maybe replaceState
+
+  document.title = shortTitle(t.title,1,1) +` [${t.id}] - recursive`;
+
+  zTopIndex=0
+  removeAllChildNodes(main)
+  noteElementsById={}
+  subNoteSvgById={}
+  subNoteById={}
+  view = viewById[t.id] || {x:0,y:0,s:1};
+  for (let i of t.children)
+    createNote(i)
+  level = t
+  setView()
+
+  removeAllChildNodes(mainSvgG)
+  if (t.lines) {
+    for (let line of t.lines) addSVGline(mainSvgG, line)
+  }
+  setBackgroundColor(t)
+  updateFavicon()
+  outlineHighlight(t)
+}
+function showNote(id){
+  trailobj=[]
+  let p=noteById[id];
+  while (p) {
+    trailobj.unshift(p)
+    p=noteParentById[p.id]
+  }
+  regenTrail()
+  populate(noteById[id])
+}
+function regenTrail(){
+  let s=[]
+  for (let i in trailobj) {
+    let n=trailobj[i], c1="#fff", c2="#ccc"
+    if (n.color && n.color.l!=0){
+      c1 = "hsl("+n.color.h+','+n.color.s+'%,'+n.color.l+"%)"
+      c2 = "hsl("+n.color.h+','+n.color.s+'%,'+n.color.l*0.8+"%)"
+    }
+    let a=document.createElement('a')
+    a.textContent=shortTitle(n.title, i==trailobj.length-1,1)
+    a.href='#'+n.id
+    a.style.background=c1;
+    a.style.borderColor=c2;
+    a.style.textDecoration= (n.title.match(/^[#]*~[^~]+~/))?'line-through':'';
+    makeDropTarget(a, n)
+    s.push(a)
+  }
+
+  removeAllChildNodes(trail)
+  for (let i=s.length;i--;) {
+    trail.append(s[i])
+    if (i) trail.append(document.createTextNode(" \u2794 "))
+  }
+}
+function shortTitle(t, last, noescape){
+  let maxlength = last ? 50:20;
+
+  if (!t) return "(no name)"
+  t = t.split("\n")[0].replace(/^[#]+/,"").replace(/~/g,"");
+  
+  if (t.length>maxlength+3) t=t.slice(0,maxlength)+"..."
+  return noescape?t:escapeEntities(t);
+}
+function background(t){
+  return mainSvg.contains(t)
+}
+function pannableTarget(t){
+  return main.contains(t) || mainSvg.contains(t)
+}
+document.onclick=function(e){
+  if (textEditing || !background(e.target))return;
+  if (penTool=="none") clearSelection()
+  if (penTool!="addnote") return;
+  clearSelection()
+  let [mx, my] = mousePos(e);
+  var newNote = {
+    id: newId(),
+    title: "New note",
+    x: mx,
+    y: my,
+    width: 200,
+    height: 50,
+    color: randomColor(),
+    children: []
+  }
+  deltaPush([{action:"addNote", id:level.id, index:-1, newNote}])
+}
+menu.onmousedown=function(e){e.stopPropagation()}
+
+var cursorStack=[];
+function pushCursor(c){
+  cursorStack.push(c)
+  setCursor(c)
+}
+function popCursor(){
+  cursorStack.pop()
+  let c = cursorStack.length? cursorStack[cursorStack.length-1] :"";
+  setCursor(c)
+}
+function setCursor(c){
+  if (c=="grab" || c=="grabbing" || c=="zoom-in") main.classList.add("panning")
+  else main.classList.remove("panning")
+  main.style.cursor=c;
+  mainSvg.style.cursor=c;
+}
+function selectAll(){
+  selection.elements=[];
+  selection.objects=[];
+  for (let i=0;i<level.children.length;i++) {
+    let c=level.children[i];
+    if (c.pinned) continue;
+      selection.objects.push(c)
+      selection.elements.push(main.children[i])
+      main.children[i].classList.add('selected')
+  }
+}
+function clearSelection(){
+  for (let e of selection.elements) {
+    e.classList.remove('selected')
+  }
+  selection.elements=[];
+  selection.objects=[];
+}
+function drawMarquee(x1,y1,x2,y2, existing) {
+  let x,y,w,h, partial=true;
+  if (x2<x1) {x=x2; w=x1-x2} else {x=x1; w=x2-x1; partial=false}
+  if (y2<y1) {y=y2; h=y1-y2} else {y=y1; h=y2-y1}
+
+  let lx = (x-view.x-offsetLeft)/view.s,
+      ly = (y-view.y)/view.s,
+      lw = w/view.s,
+      lh = h/view.s;
+
+  selection.elements=[];
+  selection.objects=[];
+
+  if (partial) {
+    function withinMarquee(c) {
+      return c.x<lx+lw
+          && c.x+c.width>lx
+          && c.y<ly+lh
+          && c.y+c.height>ly;
+    }
+  } else {
+    function withinMarquee(c) {
+      return c.x>lx
+          && c.y>ly
+          && c.x+c.width<lx+lw
+          && c.y+c.height<ly+lh;
+    }
+  }
+
+  for (let i=0;i<level.children.length;i++) {
+    let c=level.children[i];
+    if (c.pinned) continue;
+    if (withinMarquee(c) || existing.includes(c)) {
+        selection.objects.push(c)
+        selection.elements.push(main.children[i])
+        main.children[i].classList.add('selected')
+    } else main.children[i].classList.remove('selected')
+  }
+
+  marquee.style.left=x+'px'
+  marquee.style.top=y+'px'
+  marquee.style.width=w+'px';
+  marquee.style.height=h+'px';
+}
+document.onmousedown=function(e){
+  menu.style.display='none'
+  if (document.onmouseup && penTool!="hand") return;
+  if (e.target.tagName=="TEXTAREA" && e.button!=1) return;
+  var b = e.button;
+
+  if (e.target==sidebarLeftAdj){
+    setOffsetLeft(e.clientX+4)
+    document.onmousemove=function(e){
+      setOffsetLeft(e.clientX+4)
+    }
+    document.onmouseup=function(e){
+      if (offsetLeft<=32) toggleSidebarLeft();
+      saveView()
+      document.onmouseup=null;
+      document.onmousemove=null;
+    }
+  }
+  if (e.target==sidebarRightAdj){
+    setOffsetRight(window.innerWidth-e.clientX+4)
+    document.onmousemove=function(e){
+      setOffsetRight(window.innerWidth-e.clientX+4)
+    }
+    document.onmouseup=function(e){
+      if (offsetRight<=32) toggleSidebarRight();
+      saveView()
+      document.onmouseup=null;
+      document.onmousemove=null;
+    }
+  }
+
+  if (penTool=="hand" || e.button==1) { // middle click
+    if (!pannableTarget(e.target)) return
+    if (e.button==1) killEvent(e);
+    let sx = e.pageX, sy = e.pageY;
+    document.onmousemove=function(e){
+      view.x+= (e.pageX-sx)
+      view.y+= (e.pageY-sy)
+      sx = e.pageX, sy = e.pageY;
+      setView()
+    }
+    document.onmouseup=function(e){
+      if (e.button !=b) return;
+      document.onmouseup=null;
+      document.onmousemove=null;
+      saveView()
+      popCursor()
+    }
+    pushCursor('grabbing')
+    return;
+  }
+  if (penTool=="zoom"){
+    if (!pannableTarget(e.target)) return
+    let sx = e.pageX, sy = e.pageY, cx=sx, cy=sy;
+    document.onmousemove=function(e){
+      doZoom( (e.pageX-sx) + (e.pageY-sy), cx, cy)
+      sx = e.pageX, sy = e.pageY;
+    }
+    document.onmouseup=function(e){
+      if (e.button !=b) return;
+      document.onmouseup=null;
+      document.onmousemove=null;
+      saveView()
+    }
+    return;
+  }
+  if (readonly || textEditing || !background(e.target)) return;
+
+  if (penTool=="marquee"){
+    let sx = e.pageX, sy=e.pageY;
+    let existing = e.shiftKey?selection.objects:[];
+    drawMarquee(sx,sy,sx,sy, existing)
+    marquee.style.display='block'
+    document.onmousemove=function(e){
+      drawMarquee(sx,sy,e.pageX,e.pageY, existing)
+    }
+    document.onmouseup=function(e){
+      marquee.style.display='none';
+      document.onmouseup=null;
+      document.onmousemove=null;
+    }
+    return;
+  }
+
+  let [sx, sy] = mousePos(e);
+
+  if (penTool=="none" || penTool=="addnote") return;
+  if (penTool=="erase" || e.button==2) {
+
+    document.onmousemove=function(e){
+      if (e.target.tagName!="path") return;
+      let i;
+      for (i in mainSvgG.children)
+        if (mainSvgG.children[i] == e.target) break
+
+      deltaPush([{action:"eraseLine",id:level.id,index:i}])
+    }
+    document.onmouseup=function(e){
+      if (e.button !=b) return;
+      document.onmousemove=null;
+      popCursor()
+      setTimeout(()=>{
+        document.onmouseup=null;
+      },1);
+    }
+    pushCursor(cursors['erase'])
+
+  } else { // draw a line of some sort
+    var line = {points:[[sx,sy]]}, path=null;
+    if (penTool=="arrow" && arrowStyle < 3) {line.fill=penColor}
+    if (penWidth!="3px") line.width=penWidth;
+    if (penColor!="black") line.color=penColor;
+
+    path=addSVGline(mainSvgG, line)
+
+    document.onmouseup=function(e){
+      if (e.button !=b) return;
+      document.onmousemove(e)
+      document.onmouseup=null;
+      document.onmousemove=null;
+      deltaPush([{
+        action:"addLine",
+        id:level.id,
+        skipDom:true,
+        line
+      }])
+    }
+
+    if (penTool=="pencil") {
+      document.onmousemove=function(e){
+        line.points.push(mousePos(e))
+        updateSVGline(path,line)
+      }
+    } else if (penTool=="line") {
+      document.onmousemove=function(e){
+        line.points = [[sx,sy],mousePos(e)]
+        updateSVGline(path,line)
+      }
+    } else if (penTool=="arrow") {
+      line.smooth=0
+      document.onmousemove=function(e){
+        let [mx, my] = mousePos(e)
+        line.points = drawArrow( sx, sy, mx, my )
+        updateSVGline(path,line)
+      }
+    } else if (penTool=="rect") {
+      line.smooth=0
+      document.onmousemove=function(e){
+        let [mx, my] = mousePos(e)
+        line.points = [
+          [sx, sy],
+          [mx, sy],
+          [mx, my],
+          [sx, my],
+          [sx, sy], // go round again to enforce a sharp corner on chrome
+          [mx, sy]
+        ]
+        updateSVGline(path,line)
+      }
+    }
+  }
+}
+function drawArrow(x1,y1,x2,y2){
+  let dx = x2-x1, dy = y2-y1, len = Math.sqrt(dx*dx+dy*dy);
+  let h = Math.min(arrowSize,500*arrowSize*arrowSize/len);
+  dx*=h
+  dy*=h
+  let dx2 = dx*1.73205; // 2*cos(30deg)
+  let dy2 = dy*1.73205;
+  switch (arrowStyle) {
+  case "1": case "3": return [ // ⯈
+    [x1,y1],
+    [x2    -dx2,y2    -dy2],
+    [x2 -dy-dx2,y2 +dx-dy2],
+    [x2        ,y2 ],
+    [x2 +dy-dx2,y2 -dx-dy2],
+    [x2    -dx2,y2    -dy2]]  
+  case "2": case "4": return [ // ➤
+    [x1,y1],
+    [x2-dx*0.99,y2-dy*0.99],
+    [x2     -dx,y2    -dy],
+    [x2 -dy-dx2,y2 +dx-dy2],
+    [x2        ,y2 ],
+    [x2 +dy-dx2,y2 -dx-dy2],
+    [x2     -dx,y2    -dy]]
+  default: return [            // ᐳ
+    [x1,y1],
+    [x2 -dx*0.0099,y2 -dy*0.0099],
+    [x2 -dx*0.01,  y2 -dy*0.01],
+    [x2 -dy-dx*1.2,y2 +dx-dy*1.2],
+    [x2           ,y2 ],
+    [x2 +dy-dx*1.2,y2 -dx-dy*1.2],
+    [x2 -dx*0.01,  y2 -dy*0.01]]
+  }
+}
+document.onwheel=function(e){
+  if (!pannableTarget(e.target) || e.target.tagName=="TEXTAREA") return;
+  menu.style.display='none'
+
+  doZoom(e.deltaY, e.pageX, e.pageY)
+
+  saveView()
+}
+window.onhashchange = function(){
+  menu.style.display='none';
+  let i = location.hash.substr(1);
+  if ( i && noteById.hasOwnProperty(i) ) {
+    showNote(i)
+  } else {
+    // load root
+    window.history.replaceState({},'','#'+tree.id)
+    showNote(tree.id)
+  }
+}
+
+{ // touch support
+  let tsx={}, tsy={}, td=0, tcx=0,tcy=0;
+  function fakeMouse(type, t){
+    if (penTool=="none" || penTool=="hand" || penTool=="zoom") return false;
+    (penTool=="erase"?document.elementFromPoint(t.pageX,t.pageY):t.target)
+      .dispatchEvent(new MouseEvent(type, {
+          bubbles:true,
+          button:0,
+          buttons:0,
+          clientX:t.clientX,
+          clientY:t.clientY,
+          pageX:t.pageX,
+          pageY:t.pageY,
+        }))
+    return true
+  }
+  document.addEventListener("touchstart", function(e){
+    let t=e.changedTouches[0], id=t.identifier;
+    tsx[id]=t.clientX;
+    tsy[id]=t.clientY;
+    
+    if (e.touches.length>1) {
+      td = touchdistance(e.touches[0],e.touches[1]);
+      tcx = (e.touches[0].clientX+e.touches[1].clientX)/2;
+      tcy = (e.touches[0].clientY+e.touches[1].clientY)/2;
+    } else {
+      if (pannableTarget(e.target))
+        fakeMouse("mousedown",e.touches[0]);
+    }
+  }, true);
+  document.addEventListener("touchmove", function(e){
+    if (e.target==sidebarLeftAdj && e.touches.length==1) {
+      setOffsetLeft(e.touches[0].clientX+4)
+      return;
+    }
+    if (e.target==sidebarRightAdj && e.touches.length==1) {
+      setOffsetRight(window.innerWidth-e.touches[0].clientX+4)
+      return;
+    }
+    if (!pannableTarget(e.target)) return;
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (fakeMouse("mousemove",e.touches[0])) return;
+
+    if (e.touches.length==1){
+      let t=e.touches[0];
+  
+      view.x +=(t.clientX-tsx[t.identifier])
+      view.y +=(t.clientY-tsy[t.identifier])
+    
+    } else {
+      let ntcx = (e.touches[0].clientX+e.touches[1].clientX)/2;
+      let ntcy = (e.touches[0].clientY+e.touches[1].clientY)/2;
+      let ntd = touchdistance(e.touches[0],e.touches[1])
+  
+      let sx= (ntcx -view.x -offsetLeft)/view.s;
+      let sy= (ntcy -view.y            )/view.s;
+      
+      view.s *= ntd/td
+      
+      view.x = -sx*view.s + ntcx + (ntcx-tcx) -offsetLeft
+      view.y = -sy*view.s + ntcy + (ntcy-tcy)
+  
+      td = ntd
+      tcx = ntcx
+      tcy = ntcy
+    }
+  
+    for (let i=0;i< e.changedTouches.length;i++) {
+      tsx[e.changedTouches[i].identifier]=e.changedTouches[i].clientX;
+      tsy[e.changedTouches[i].identifier]=e.changedTouches[i].clientY;
+    }
+    setView()
+  }, {capture:true, passive:false});
+  document.addEventListener("touchend", function(e){
+    if (e.touches.length==0) {
+      if (fakeMouse("mouseup",e.changedTouches[0])) return; //todo: also check if target==sidebarLeftAdj
+      saveView()
+    }
+  }, true);
+  function touchdistance(t1,t2){
+    return Math.sqrt((t1.clientX-t2.clientX)*(t1.clientX-t2.clientX) + (t1.clientY-t2.clientY)*(t1.clientY-t2.clientY))
+  }
+}
+
+function escapeEntities(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+function markdownApply(s, j){
+  let lines = s.replace(/</g,'&lt;').replace(/>/g,'&gt;').split("\n") //ampersand may occur in url
+  let links=[]
+  let namedlinks=[]
+  let codes=[]
+  let images=[]
+  let list = [], indentstack=[];
+  for (let i in lines){
+    let indent=0, listtag="ul>";
+    lines[i]=lines[i]
+      .replace(/`([^`]+)`/g,function(m, p1){
+        codes.push(p1)
+        return "<PRECODE>"; //first replace ensures this won't be present
+      })
+      .replace(/!\[([^\]]+)\]\(([^\)]+)\)/g,function(m, p1, p2){
+        images.push([p1,p2])
+        return "<IMAGES>";
+      })
+      .replace(/\[([^\]]+)\]\(([^\)]+)\)/g,function(m, p1, p2){
+        namedlinks.push([p1,p2])
+        return "<NAMEDLINK>";
+      })
+      .replace(/(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~*+#-]*[\w@?^=%&\/~*+#-])?/gi,function(match){
+        links.push(match)
+        return "<LINK>";
+      })
+      .replace(/^([ ]*)[-\*] (.+)$/, function(m,p1,p2){
+        indent=p1.length+1;
+        listtag="ul>";
+        return `<li data-i="${i},${j}">${p2}`
+      })
+      .replace(/^([ ]*)[0-9]{1,2}\. (.+)$/, function(m,p1,p2){
+        indent=p1.length+1;
+        listtag="ol>";
+        return `<li data-i="${i},${j}">${p2}`
+      })
+      //.replace(/&(?!lt;|gt;)/g,'&amp;')
+      .replace(/^([#]+)(.+)$/,function(m, p1, p2){
+        if (p1=='#') return '<h3>'+p2+'</h3>'
+        if (p1=='##') return '<h2>'+p2+'</h2>'
+        return '<h1>'+p2+'</h1>'
+      });
+
+      if (indent && (indentstack.length==0 || indentstack[0]<indent)) { // indent increased, can only increase by one at a time
+        indentstack.unshift(indent)
+      } else while (indentstack.length && indent != indentstack[0]){ // indent must have dropped, by one or more
+        indentstack.shift()
+      }
+      while (list.length<indentstack.length) lines[i]="<"+listtag+lines[i],list.push("</"+listtag);
+      let closing=[]
+      while (list.length>indentstack.length) closing.push(list.pop())
+      if (closing.length) lines[i]=closing.join("")+lines[i];
+
+      if (list.length && i==lines.length-1) {
+        while (list.length) lines[i]+=list.pop();
+      }
+  }
+  return lines.join("<br>")
+        .replace(/_([^_]+)_/g,'<i>$1</i>')
+        .replace(/\*([^\*]+)\*/g,'<b>$1</b>')
+        .replace(/~([^~]*)~/g,'<s>$1</s>')
+        .replace(/<PRECODE>/g,function(m){
+          return "<code>"+codes.shift()+"</code>";
+        })
+        .replace(/<LINK>/g,function(m){
+            let l = links.shift()
+            return "<a href='"+l+"' rel='noreferrer noopener' target=_blank>"+l+"</a>"
+        })
+        .replace(/<NAMEDLINK>/g,function(m){
+            let [t,l] = namedlinks.shift()
+            return "<a href='"+l+"' rel='noreferrer noopener' target=_blank>"+t+"</a>"
+        })
+        .replace(/<IMAGES>/g,function(m){
+            let [alt, src] = images.shift()
+            return `<img onmousedown='return false' src="${src}" alt="${alt}">`
+        })
+}
+function markdown(s){
+  //separate out preformatted areas first
+  let pre = s.split(/[\n]?```[\n]?/)
+  for (let i = 0; i<pre.length; i++) {
+    if (i%2) pre[i]="<pre>"+escapeEntities(pre[i])+"</pre>"
+    else pre[i] = markdownApply(pre[i],i)
+  }
+  return pre.join("\n")
+}
+function toggleBulletStrike(n, i, j){
+  let joints = n.title.match(/[\n]?```[\n]?/g) || [];
+
+  let pre = n.title.split(/[\n]?```[\n]?/)
+  let lines = pre[j].split('\n')
+  let b = lines[i].match(/^([ ]*)([-\*] |[0-9]{1,2}\. )(.+)$/)
+  let m = b[3].match(/^~([\s\S]+)~$/)
+  if (m) {
+    b[3] = m[1]
+  } else {
+    b[3] = '~'+b[3]+'~'
+  }
+  lines[i] = b[1]+b[2]+b[3];
+  pre[j]=lines.join('\n')
+  let newTitle = ""
+  for (let s in pre) {
+    newTitle += pre[s] + (joints[s] || "")
+  }
+  n.title=newTitle;
+}
+function autoIndex(n){
+  return Math.round(Math.sqrt(n.x*n.x +n.y*n.y))
+}
+function areaOfOverlap(a, b, dx, dy){
+  let h = Math.min(Math.max(0,Math.min(a.x+dx+a.width-b.x, b.x+b.width-a.x-dx)),a.width,b.width);
+  let v = Math.min(Math.max(0,Math.min(a.y+dy+a.height-b.y, b.y+b.height-a.y-dy)),a.height,b.height);
+  return h*v // / Math.min(a.width*a.height, b.width*b.height)
+}
+function mostOverlapping(n, ignore, dx, dy){
+  let m, ma=0;
+  for (let i in level.children){
+    let c=level.children[i];
+    if (c.pinned || ignore.objects.includes(c)) continue;
+    let a=areaOfOverlap(n, c, dx, dy)
+    if (a>ma) {ma=a; m=i}
+  }
+  return [m, ma]
+}
+function clamp(i){
+  if (i>1) return 1;
+  if (i<0) return 0
+  return i
+}
+function yiq2hsl(y, i, q) {
+  let r = clamp((y + ( 0.956 * i) + ( 0.621 * q)) );
+  let g = clamp((y + (-0.272 * i) + (-0.647 * q)) );
+  let b = clamp((y + (-1.105 * i) + ( 1.702 * q)) );
+  return rgb2hsl(r,g,b)
+}
+function hex2hsl(c){
+  c = c.match(/[a-z0-9]{2}/gi)
+  return rgb2hsl( parseInt(c[0],16)/255, parseInt(c[1],16)/255, parseInt(c[2],16)/255 );
+}
+function rgb2hsl(r,g,b) {
+  let min = Math.min( r, g, b );
+  let max = Math.max( r, g, b );
+  l = (max+min)*50;
+  if (max==min) return {h:0,s:0,l};
+
+  let d = max - min;
+  s = l > 50 ? d / (2 - max - min) : d / (max + min);
+  switch(max){
+    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+    case g: h = (b - r) / d + 2; break;
+    case b: h = (r - g) / d + 4; break;
+  }
+  h *= 60;
+  s *=100;
+
+  return {h,s,l}
+}
+function hue2rgb(p, q, t){
+  if(t < 0) t += 1;
+  if(t > 1) t -= 1;
+  if(t < 1/6) return p + (q - p) * 6 * t;
+  if(t < 1/2) return q;
+  if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+  return p;
+}
+function hsl2rgb(h, s, l){
+  var r, g, b;
+  h/=360;
+  s/=100;
+  l/=100;
+
+  if(s == 0){
+    r = g = b = l;
+  }else{
+    var q = l <= 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1/3);
+  }
+  return '#'+hex(r)+hex(g)+hex(b);
+}
+function hex(s){
+  return ('00'+Math.round(s * 255).toString(16)).substr(-2,2);
+}
+var sColor=Math.random()*3.14159
+function randomColor(){
+  let angle = sColor+=1.3 // Math.random()*2*3.1415926535;
+  return yiq2hsl( 0.8, 0.5*Math.cos(angle), 0.5*Math.sin(angle) );
+}
+const inverseDelta = {
+  "addLine":"eraseLine",
+  "eraseLine":"addLine",
+  "eraseAllLines":"undoEraseAllLines",
+  "undoEraseAllLines":"eraseAllLines",
+  "setTitle":"setTitle",
+  "setLayout":"setLayout",
+  "setColor":"setColor",
+  "toggleBulletStrike":"toggleBulletStrike",
+  "toggleStrike":"toggleStrike",
+  "togglePinned":"togglePinned",
+  "deleteNote":"addNote",
+  "addNote":"deleteNote",
+  "setParent":"setParent",
+  "newRoot":"undoNewRoot",
+  "undoNewRoot":"newRoot"
+}
+const deltaDescription = {
+  "addLine":"drawing",
+  "eraseLine":"drawing",
+  "setTitle":"edit text"
+}
+function describeActivity(a,redo){
+  let desc, affected=[];
+  if (Array.isArray(a)) {
+    desc = a[redo?a.length-1:0].action
+    for (let n of a) affected.push(n.id)
+  } else {
+    desc = a.action
+    affected = [a.id]
+  }
+  if (redo) {
+    affected.reverse()
+  } else {
+    desc=inverseDelta[desc];
+  }
+  if (deltaDescription[desc]) desc = deltaDescription[desc]
+  return desc + ' on #' + affected.join(', #');
+}
+function populateActivity(){
+  removeAllChildNodes(activity)
+  let activities=[], last;
+  for (let a of deltaHistory) {
+    let d = describeActivity(a,0)
+    if (last && last==d) activities[activities.length-1][1]++;
+    else activities.push([d,1,0])
+    last=d
+  }
+  last=null
+  for (let i=redoHistory.length;i--;) {
+    let d = describeActivity(redoHistory[i],1)
+    if (last && last==d) activities[activities.length-1][1]++;
+    else activities.push([d,1,1])
+    last=d
+  }
+
+  for (let a of activities) {
+    let d=document.createElement('div');
+    d.classList.add('action')
+    if (a[2]) d.classList.add('redo')
+    d.innerHTML = a[0] + (a[1]>1?' ('+a[1]+')':'');
+    activity.append(d)
+  }
+}
+function save(){
+  populateActivity()
+  localStorage.tree=JSON.stringify(tree)
+}
+function saveView(){
+  viewById[level.id]=view
+  localStorage.view=JSON.stringify(viewById)
+}
+function deltaPush(actions){
+  if (readonly) return;
+  let undo=[];
+  for (let a of actions) undo.push(deltaAction(a))
+  deltaHistory.push(undo)
+  deltaCleanup()
+  redoHistory=[]
+  save()
+}
+function undo(){
+  traverseHistory(deltaHistory, redoHistory)
+}
+function redo(){
+  traverseHistory(redoHistory, deltaHistory)
+}
+function traverseHistory(from, to){
+  var u = from.pop()
+  if (!u) return
+
+  if (Array.isArray(u)) {
+    let i,r=[];
+    while (i = u.pop()) r.push(deltaAction(i));
+    to.push(r)
+  } else to.push(deltaAction(u))
+
+  deltaCleanup()
+  save()
+}
+var deltaFlags={ rePopulateOutline:false, showNote:false, delayedShowNote:false };
+function deltaCleanup(){
+  if (deltaFlags.rePopulateOutline) {
+    rePopulateOutline();
+    deltaFlags.rePopulateOutline=false
+  }
+  if (deltaFlags.showNote!==false) {
+    showNote(deltaFlags.showNote);
+    deltaFlags.showNote=false
+  }
+  if (deltaFlags.delayedShowNote!==false) {
+    let dsn = deltaFlags.delayedShowNote
+    setTimeout(()=>{
+      showNote(dsn);
+      deltaFlags.delayedShowNote=false
+    },300)
+  }
+}
+function deltaAction(a){
+  let undo = {id:a.id}, n=noteById[a.id], d=noteElementsById[n.id];
+  switch(a.action){
+    case "addLine":
+      undo.action="eraseLine"
+      if (!n.lines) n.lines=[];
+      if (a.index>=0) {
+        undo.index=a.index
+        n.lines.splice(a.index,0,a.line)
+      } else {
+        n.lines.push(a.line)
+        undo.index=n.lines.length-1
+      }
+      if (a.skipDom) break;
+      if (n==level) addSVGline(mainSvgG, a.line, undo.index)
+      else if (level.children.includes(n)) {
+        addSVGline(subNoteSvgById[n.id], a.line, undo.index)
+      }
+    break;
+    case "eraseLine":
+      undo.action="addLine"
+      undo.index = a.index
+      undo.line = n.lines.splice(a.index,1)[0];
+      if (n==level) mainSvgG.children[a.index].remove()
+      else if (level.children.includes(n)) {
+        subNoteSvgById[n.id].children[a.index].remove()
+      }
+    break;
+    case "eraseAllLines":
+      undo.action="undoEraseAllLines"
+      undo.lines=n.lines
+      delete n.lines;
+      if (n==level) removeAllChildNodes(mainSvgG)
+      else if (level.children.includes(n)) {
+        removeAllChildNodes(subNoteSvgById[n.id])
+      }
+    break;
+    case "undoEraseAllLines":
+      undo.action="eraseAllLines"
+      n.lines=a.lines
+      if (!n.lines) break;
+      if (n==level) {
+        for (let line of n.lines) addSVGline(mainSvgG, line)
+      }
+      else if (level.children.includes(n)) {
+        for (let line of n.lines) addSVGline(subNoteSvgById[n.id], line)
+      }
+    break;
+    case "setTitle":
+      undo.action="setTitle";
+      undo.title=n.title;
+      n.title = a.title;
+      if (d) d.children[1].innerHTML = markdown(n.title);
+      else if (subNoteById[n.id]) subNoteById[n.id].innerHTML=markdown(n.title)
+      updateOutlineLink(n)
+      if (trailobj.includes(n)) regenTrail();
+    break;
+    case "setLayout":
+      undo.action="setLayout"
+      undo.x = n.x
+      undo.y = n.y
+      undo.width = n.width
+      undo.height = n.height
+      n.x = a.x
+      n.y = a.y
+      n.width = a.width
+      n.height = a.height
+      if (a.skipDom) break;
+      if (d) setNoteLayout(n,d)
+      else if (subNoteById[n.id]) setNoteLayout(n, subNoteById[n.id])
+    break;
+    case "setColor":
+      undo.action="setColor"
+      undo.color = n.color
+      n.color = a.color
+      if (d) setNoteColor(n, d)
+      else if (subNoteById[n.id]) setNoteColor(n, subNoteById[n.id])
+      else if (level==n) setBackgroundColor(n)
+      outlineLinksById[n.id].style.background=
+        (n.color && n.color.l) ?
+        'hsl('+n.color.h+','+n.color.s+'%,'+n.color.l+'%)'
+        : '';
+      if (trailobj.includes(n)) regenTrail();
+    break;
+    case "toggleBulletStrike":
+      undo.action="toggleBulletStrike"
+      undo.i=a.i
+      undo.j=a.j
+      toggleBulletStrike(n,a.i,a.j)
+      if (d) d.children[1].innerHTML = markdown(n.title);
+      else if (subNoteById[n.id]) subNoteById[n.id].innerHTML=markdown(n.title)
+      // currently bulletstrike isn't even rendered in the outline or trail
+      //updateOutlineLink(n)
+    break;
+    case "toggleStrike":
+      undo.action="toggleStrike"
+      let [x, h, b] = n.title.match(/^(#+)?([\s\S]+)$/)
+      if (!h) h="";
+      let m = b.match(/^~([\s\S]+)~$/)
+      if (m){
+        n.title=h+m[1];
+      } else {
+        n.title=h+'~'+b+'~'
+      }
+      if (d) d.children[1].innerHTML = markdown(n.title)
+      else if (subNoteById[n.id]) subNoteById[n.id].innerHTML=markdown(n.title)
+      updateOutlineLink(n)
+      if (trailobj.includes(n)) regenTrail();
+    break;
+    case "togglePinned":
+      undo.action="togglePinned"
+      n.pinned=1-(n.pinned||0);
+      if (d) {
+        if (n.pinned) d.classList.add("pinned")
+        else d.classList.remove("pinned")
+      }
+    break;
+    case "deleteNote":
+      undo.action="addNote"
+      undo.id = noteParentById[n.id].id;
+      undo.newNote = n
+      undo.index = noteParentById[n.id].children.indexOf(n);
+
+      if (!d && noteContains( n, level )) {
+        deltaFlags.showNote=undo.id
+      }
+      noteParentById[n.id].children.splice( undo.index, 1 )
+      if (d) {
+        d.remove()
+        delete noteElementsById[n.id];
+      } else if (subNoteById[n.id]) {
+        subNoteById[n.id].remove()
+        delete subNoteById[n.id];
+      }
+      // todo: update outline without repopulate
+      deltaFlags.rePopulateOutline=true
+      delete noteById[n.id];
+      delete noteParentById[n.id];
+    break;
+    case "addNote":
+      undo.action="deleteNote"
+      undo.id=a.newNote.id;
+
+      openViewIfEmpty(n)
+      if (level==n) createNote(a.newNote, a.index==-1, a.index)
+      else if (level==noteParentById[n.id]) {
+        d.lastChild.append(createSubNote(a.newNote))
+      }
+      if (a.index>=0) n.children.splice(a.index,0,a.newNote)
+      else n.children.push(a.newNote)
+      noteById[a.newNote.id]=a.newNote;
+      noteParentById[a.newNote.id]=n;
+
+      deltaFlags.rePopulateOutline=true //todo: improve
+    break;
+    case "setParent":
+      let oldParent=noteParentById[n.id];
+      let newParent=
+        (a.parent==-1)
+        ?noteParentById[oldParent.id]
+        :noteById[a.parent];
+
+      undo.action="setParent"
+      undo.index = oldParent.children.indexOf(n)
+      undo.parent = oldParent.id
+
+      oldParent.children.splice(undo.index, 1)
+
+      if (a.index>=0) {
+        newParent.children.splice(a.index,0,n)
+      } else {
+        newParent.children.push(n)
+      }
+      noteParentById[n.id]=newParent;
+
+      // check if changes are visible...
+
+      if (d && noteElementsById[newParent.id] && a.animate) {
+        d.style.transition="0.3s linear"
+        d.style.transform="scale(0)"
+        deltaFlags.delayedShowNote=level.id
+      } else if (d && a.animate && oldParent==level && newParent==noteParentById[level.id]){
+        d.style.transition="0.3s"
+        d.style.transform="translateY(-100px)"
+        d.style.opacity="0"
+        deltaFlags.delayedShowNote=newParent.id
+      } else deltaFlags.showNote=level.id
+
+      deltaFlags.rePopulateOutline=true
+    break;
+    case "newRoot":
+      undo.action="undoNewRoot"
+
+      let id = a.newId || newId();
+
+      tree.x=50 //todo: check it doesn't collide with menuref
+      tree.y=50
+      tree.width=200
+      tree.height=200
+      tree.color={h:0,s:0,l:100}
+      tree.title="Old root"
+      tree = {title:"Root", id:id, children:[tree]}
+      noteById[id]=tree;
+      noteParentById[ tree.children[0].id ]=tree;
+
+      level=tree
+      trailobj.unshift(tree)
+      //regenTrail()
+    break;
+    case "undoNewRoot":
+      undo.action="newRoot"
+      undo.newId=tree.id
+      delete noteById[tree.id]
+      delete noteParentById[tree.children[0].id]
+      tree = tree.children[0]
+      tree.title="Root"
+      trailobj.shift()
+
+      deltaFlags.showNote=tree.id
+      deltaFlags.rePopulateOutline=true
+    break;
+  }
+  return undo
+}
+function pan(dx,dy) {
+  menu.style.display='none'
+  view.x += dx;
+  view.y += dy;
+  setView()
+  saveView()
+}
+function zoomCentred(s){
+  doZoom(s, (window.innerWidth+offsetLeft-offsetRight)/2, window.innerHeight/2)
+  saveView();
+}
+function doZoom(delta, cx, cy){
+  let sx= (cx-view.x-offsetLeft)/view.s,
+      sy= (cy-view.y           )/view.s;
+
+  view.s*= Math.pow(10,delta*-0.001);
+
+  view.x = -sx*view.s+cx-offsetLeft
+  view.y = -sy*view.s+cy
+
+  setView()
+}
+sidebarLeft.onkeydown=function(e){if (e.key!='/') e.stopPropagation()}
+document.onkeydown=function(e){
+  if (e.ctrlKey && e.key=='z') {undo(); return}
+  if (e.ctrlKey && (e.key=='Z' || e.key=='y')) {redo(); return}
+  if (e.ctrlKey && e.key=='a') {selectAll(); return}
+
+  switch(e.key) {
+    case 'ArrowLeft': pan(100,0); return;
+    case 'ArrowUp':   pan(0,100); return;
+    case 'ArrowRight':pan(-100,0); return;
+    case 'ArrowDown': pan(0,-100); return;
+    case 'PageDown': case '-': zoomCentred(100); return;
+    case 'PageUp':   case '+': zoomCentred(-100); return;
+    case 'Home': zoomReset(); return;
+    case 'End': zoomFit(); return;
+    case 't': setPenTool('addnote'); return;
+    case 'm': setPenTool('marquee'); return;
+    case 'b': setPenTool('pencil'); return;
+    case 'l': setPenTool('line'); return;
+    case 'a': setPenTool('arrow'); return;
+    case 'r': setPenTool('rect'); return;
+    case 'e': setPenTool('erase'); return;
+    case 'h': setPenTool('hand'); return;
+    case 'z': setPenTool('zoom'); return;
+    case 's': toggleSidebarLeft(); return;
+    case 'S': toggleSidebarRight(); return;
+    case 'q': toggleMoreControls(); return;
+    case '/':
+      if (document.activeElement==searchInput) return;
+      killEvent(e);
+      if (!offsetLeft) toggleSidebarLeft();
+      searchInput.focus();
+      return;
+    case 'Escape':
+      setPenTool('none');
+      clearSelection();
+      menu.style.display='none';
+      help.style.display='none';
+      return;
+    case 'Delete':
+      if (!selection.objects.length) return;
+      menuRef=selection.objects[0]; menuRefElement=selection.elements[0];
+      menuAction({action:"deleteNote"})
+      return;
+  }
+}
+function setPenTool(newTool){
+  if (document.onmouseup!=null) return;
+  if (readonly && newTool!="hand" && newTool!="zoom" && newTool != "none") return;
+
+  for (let t of penTools) toolButtons[t].classList.remove("active")
+  if (toolButtons[newTool]) toolButtons[newTool].classList.add("active");
+
+  if (penTool!=newTool) {
+    if (cursors[penTool]) popCursor()
+    if (cursors[newTool]) pushCursor(cursors[newTool])
+  }
+  penTool = newTool
+
+  if (rightClickAction[penTool]) document.oncontextmenu=backgroundKillEvent;
+  else document.oncontextmenu=null;
+}
+function downloadJson(){
+  let blob = new Blob([JSON.stringify({tree,view:viewById})], {type: "application/json"})
+  let url = URL.createObjectURL(blob)
+  let a = document.createElement('a')
+  a.href=url
+  a.download="tree.json"
+  document.body.appendChild(a);
+  a.click()
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url)
+}
+
+document.onpaste = function (event) {
+  var items = (event.clipboardData || event.originalEvent.clipboardData).items;
+
+  for (var index in items) {
+    var item = items[index];
+    if (item.kind === 'file') {
+      var blob = item.getAsFile();
+      var file = new File([blob], "capture.png", { type: 'image/png' });
+
+      var reader = new FileReader();
+      reader.onload = function (event) {
+        let e=document.querySelector('textarea')
+        if (!e) return;
+        let t=e.value;
+        e.value =
+          t.substring(0, e.selectionStart) +
+          '![pasted image](' + event.target.result + ')'
+          + t.substring(e.selectionEnd, t.length)
+      }; 
+      reader.readAsDataURL(blob);
+    }
+  }
+};
+
+const mainSvg=document.querySelector('svg')
+const mainSvgG=mainSvg.firstChild
+const svgNS = "http://www.w3.org/2000/svg"
+function setSVGsize(svg, w,h){
+  svg.setAttribute("width",w)
+  svg.setAttribute("height",h)
+  svg.setAttribute("viewBox", `0 0 ${w} ${h}`)
+}
+function addSVGline(svg, line, index){
+  let path=document.createElementNS(svgNS, "path");
+  path.setAttributeNS(null, "style", "stroke-width: "+(line.width||'3px')+"; fill: "+(line.fill||'none')+"; stroke: "+(line.color||'black'))
+  path.setAttributeNS(null, "stroke-linecap", "round")
+  if (!line.points.length) return;
+  updateSVGline(path, line);
+
+  if (index>=0){
+    svg.insertBefore(path, svg.children[index])
+  }else{
+    svg.appendChild(path)
+  }
+  return path
+}
+function updateSVGline(path, line){
+  let pathstring = "M "+line.points[0].join(',')
+  let smoothing = line.hasOwnProperty("smooth") ? line.smooth : penSmooth;
+  if (smoothing) {
+
+    let last = line.points.length -2;
+
+    for (let i=0;i<line.points.length-1;i++) {
+      let x0 = i==0? line.points[0][0] : line.points[i-1][0];
+      let y0 = i==0? line.points[0][1] : line.points[i-1][1];
+
+      let x1 = line.points[i][0];
+      let y1 = line.points[i][1];
+      let x2 = line.points[i+1][0];
+      let y2 = line.points[i+1][1];
+
+      let x3 = i==last? x2 : line.points[i+2][0];
+      let y3 = i==last? y2 : line.points[i+2][1];
+
+      let cp1x = x1 + (x2 - x0) * smoothing;
+      let cp1y = y1 + (y2 - y0) * smoothing;
+      let cp2x = x2 + (x1 - x3) * smoothing;
+      let cp2y = y2 + (y1 - y3) * smoothing;
+
+      pathstring += ` C${cp1x},${cp1y},${cp2x},${cp2y},${x2},${y2}`;
+    }
+
+  } else {
+    for (let i=1;i<line.points.length;i++) pathstring += "L "+line.points[i].join(',')
+  }
+  path.setAttributeNS(null, "d", pathstring)
+}
+;(window.onresize=function(){
+  setSVGsize(mainSvg, window.innerWidth,window.innerHeight);
+})();
+
+document.body.addEventListener('dragover', killEvent, false);
+document.body.addEventListener('drop', function(e){
+  e.stopPropagation();
+  e.preventDefault();
+
+  let files = e.dataTransfer.files;
+  if (!files.length || !files[0].name.includes(".json")) return;
+
+  let reader = new FileReader();
+  reader.onload = function(e) {
+
+    let newtree, data = JSON.parse(e.target.result);
+    if (data.tree) { // new format
+      newtree = data.tree
+      viewById = data.view
+    } else {
+      newtree = data
+      viewById = {} // todo: maybe load properly from old format
+    }
+    if (!validTree(newtree)) {alert("Invalid JSON data"); return }
+    if (!confirm("Delete everything and load "+files[0].name+'?')) return;
+
+    tree=newtree;
+    deltaHistory=[]
+    redoHistory=[]
+    searchInput.value='';
+    save()
+    reloadAll()
+  }
+  reader.readAsText(files[0])
+
+},false);
+
+// Todo: check IDs are unique
+// check lines
+// check color of root if present
+function validTree(t){
+  if (!t.title || !Array.isArray(t.children)) return false;
+  for (let c of t.children){
+    if (typeof c.width !=="number"
+     || typeof c.height !=="number"
+     || typeof c.x !=="number"
+     || typeof c.y !=="number"
+     || typeof c.color !=="object"
+     || typeof c.color.l !=="number"
+     || typeof c.color.h !=="number"
+     || typeof c.color.s !=="number"
+     //|| typeof c.id !=="number"
+     || !validTree(c)
+    ) return false
+  }
+  return true
+}
+
+var nextId = 0;
+var allIds=[], noteById={}, noteParentById={}, noteElementsById={}, subNoteById={}, subNoteSvgById={};
+
+function findIds(ids, n) {
+  if (n.id) ids.push(n.id)
+  for (let c of n.children)
+    findIds(ids,c)
+}
+function idInUse(id) {
+  return (allIds.includes(id))
+}
+function newId(){
+  while (idInUse(nextId)) nextId=(nextId+1||allIds.length);
+  allIds.push(nextId)
+  return nextId
+}
+function genLookups(n) {
+  if (!n.id) n.id = newId();
+  noteById[n.id]=n;
+  for (let c of n.children) {
+    genLookups(c)
+    noteParentById[c.id]=n
+  }
+}
+function reGenLookups(){
+  noteById={}
+  noteParentById={}
+  genLookups(tree)
+  // should we set noteParentById[tree.id] to something?
+}
+function noteContains(haystack,needle){
+  if (haystack==needle/* || haystack.children.indexOf(needle)!=-1*/) return true;
+  for (c of haystack.children)
+    if (noteContains(c,needle)) return true
+  return false
+}
+function makeDropTarget(a, n) {
+  a.ondrop=function(e){
+    let data = e.dataTransfer.items;
+    for (let i=0;i<data.length;i++) {
+      if (data[i].kind === 'string' && data[i].type.match('^text/uri-list')) {
+        data[i].getAsString(function(s) {
+          s = s.split('#')
+          if (s[0] != location.href.split('#')[0]) return;
+          let moved = noteById[parseInt(s[1])];
+
+          if (!readonly && moved && !noteContains(moved, n) && confirm('Move "'+shortTitle(moved.title)+'" into "'+shortTitle(n.title)+'"?')){
+            openViewIfEmpty(n)
+            deltaPush([{
+              action:"setParent",
+              id:moved.id,
+              parent:n.id
+            }])
+          }
+          a.className=''
+        })
+      }
+    }
+  }
+  a.ondragenter=function(e){a.className='drop'}
+  a.ondragleave=function(e){a.className=''}
+}
+var outlineLinksById={};
+function updateOutlineLink(n){
+  let a = outlineLinksById[n.id];
+  a.textContent=shortTitle(n.title,1,1)
+  a.href='#'+n.id
+  a.onclick=function(e){
+    if (e.shiftKey) {location.href='#'+noteParentById[n.id].id; return false }
+    if (level.id==n.id) outlineLinksById[n.id].parentNode.click();
+  }
+  if (n.color && n.color.l) a.style.background='hsl('+n.color.h+','+n.color.s+'%,'+n.color.l+'%)';
+  else a.style.background='';
+  a.style.textDecoration= (n.title.match(/^[#]*~[^~]+~/))?'line-through':'';
+}
+function outlineHighlight(n){
+  for (let a in outlineLinksById) outlineLinksById[a].parentNode.classList.remove('outline-hl','outline-hl2')
+
+  let t=n;
+  outlineLinksById[t.id].parentNode.classList.add('outline-hl2')
+  while (t=noteParentById[t.id]) {
+    outlineLinksById[t.id].parentNode.classList.add('outline-hl')
+    if (offsetLeft) {
+      initView(t)
+      viewById[t.id].open=true
+      outlineLinksById[t.id].parentNode.parentNode.setAttribute('open','')
+    }
+  }
+
+  if (offsetLeft)
+    outline.scroll( 
+      Math.min( outline.scrollLeft, outlineLinksById[n.id].offsetLeft-22 ),
+      outlineLinksById[n.id].offsetTop - (window.innerHeight-32-22)/2
+    )
+}
+function populateOutline(n,parent){
+
+  let a=document.createElement('a');
+  outlineLinksById[n.id]=a;
+  updateOutlineLink(n)
+
+  makeDropTarget(a, n)
+
+  let p=document.createElement('p')
+
+  if (n.children.length==0) {
+    p.append(a)
+    parent.append(p)
+    return
+  }
+
+  let d=document.createElement('details')
+  let s=document.createElement('summary')
+
+  d.ontoggle=function(){
+    initView(n)
+    viewById[n.id].open=d.open;
+    saveView()
+  }
+  if (viewById[n.id] && viewById[n.id].open) {d.setAttribute('open','')}
+
+  s.append(a)
+  d.append(s)
+  d.append(p)
+  parent.append(d)
+
+  for (c of n.children)
+    populateOutline(c,p)
+}
+function rePopulateOutline(){
+  removeAllChildNodes(outline)
+  outlineLinksById={};
+  initView(tree)
+  if (!viewById[tree.id].hasOwnProperty('open')) viewById[tree.id].open=true;
+  populateOutline(tree,outline)
+
+  search(searchInput)
+}
+var searchResults=[], reverseSearchDirection=false;
+searchInput.onkeydown=function(e){
+  if (e.key=='Escape') searchInput.blur();
+  reverseSearchDirection=e.shiftKey
+}
+searchInput.onkeyup=function(e){
+  if (e.key=='Shift') reverseSearchDirection=false;
+}
+function searchCheck(n,r){
+  let el = outlineLinksById[n.id].parentNode;
+  let match = r.test(n.title);
+  if (match) {
+    if (n.children.length || n==tree) searchResults.push(n.id);
+    else searchResults.push(noteParentById[n.id].id);
+  }
+
+  for (let c of n.children)
+    if (searchCheck(c,r)) match=true;
+
+  el.className = match?"":"sresult";
+  return match
+}
+function search(o){
+  let r;
+  try {
+    r = new RegExp(o.value,'i');
+  } catch(e) {
+    r = new RegExp( escapeRegExp(o.value) ,'i');
+  }
+  searchResults=[];
+
+  //todo: make async
+  searchCheck(tree, r)
+
+  searchResults=Array.from(new Set(searchResults)) // remove duplicates
+}
+function jumpFirstSearch(){
+  if (searchResults.length) {
+    let p = searchResults.indexOf(level.id);
+    if (reverseSearchDirection) p+=searchResults.length-2;
+    showNote(searchResults[ (p+1)%searchResults.length ] );
+  }
+}
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+function reloadAll(){
+  // Some notes may not have an id, but others further down the tree potentially could
+  // Do two passes to make sure we don't assign an in-use id
+  allIds=[]
+  findIds(allIds,tree)
+  nextId=Math.max(0,...allIds) +1;
+
+  reGenLookups()
+  rePopulateOutline()
+
+  window.onhashchange()
+
+  if (!viewById.sidebarLeft) viewById.sidebarLeft = {size:200,open:false}
+  if (viewById.sidebarLeft.open) {
+    offsetLeft=viewById.sidebarLeft.size
+    sidebarLeft.style.visibility="visible"
+    sidebarLeft.style.left="0px"
+    sidebarLeft.style.width=offsetLeft+'px'
+    canvas.style.left=offsetLeft+'px'
+    toolButtons.sidebar.classList.add('active')
+  } else {
+    offsetLeft = 0;
+    sidebarLeft.style.visibility="hidden"
+    sidebarLeft.style.left=-viewById.sidebarLeft.size+'px'
+    sidebarLeft.style.width=viewById.sidebarLeft.size+'px'
+    canvas.style.left="0px"
+    toolButtons.sidebar.classList.remove('active')
+  }
+
+  if (!viewById.sidebarRight) viewById.sidebarRight = {size:200,open:false}
+  if (viewById.sidebarRight.open) {
+    offsetRight=viewById.sidebarRight.size
+    sidebarRight.style.visibility="visible"
+    sidebarRight.style.right="0px"
+    sidebarRight.style.width=offsetRight+'px'
+    toolButtons.history.classList.add('active')
+  } else {
+    offsetRight = 0;
+    sidebarRight.style.visibility="hidden"
+    sidebarRight.style.right=-viewById.sidebarRight.size+'px'
+    sidebarRight.style.width= viewById.sidebarRight.size+'px'
+    toolButtons.history.classList.remove('active')
+  }
+}
+
+var penTool = "none";
+var penColor = document.getElementById('pencolor').value || "black";
+var penWidth = document.getElementById('penwidth').value || "3px";
+var arrowStyle = document.getElementById('arrowstyle').value || "3";
+var arrowSize = document.getElementById('arrowsize').value/50 || 0.12;
+
+var penTools=["addnote","marquee","pencil","line","arrow","rect","erase","hand","zoom"]
+var cursors={
+  'hand':'grab',
+  'pencil': 'url(icons/pencil.png) 2 21, crosshair',
+  'erase': 'url(icons/erase.png) 5 20, crosshair',
+  'marquee': 'crosshair',
+  'line': 'crosshair',
+  'arrow': 'crosshair',
+  'rect': 'crosshair',
+  'addnote': 'copy',
+  'zoom':'zoom-in'
+}
+var toolTips={
+  "addnote":"Add note [T]",
+  "marquee":"Marquee [M]",
+  "pencil":"Pencil [B]",
+  "line":"Line [L]",
+  "arrow":"Arrow [A]",
+  "rect":"Rectangle [R]",
+  "erase":"Erase [E]",
+  "hand":"Hand [H]",
+  "zoom":"Zoom [Z]"
+}
+var rightClickAction={
+  "pencil":true,
+  "line":true,
+  "arrow":true,
+  "rect":true
+}
+var toolButtons={}
+function toolButton(name, title){
+  let b = document.createElement('button')
+  b.className="tool"
+  b.style.backgroundImage=`url(icons/${name}.png)`
+  b.title=title||"";
+  toolButtons[name]=b
+  toolbox.append(b)
+  return b
+}
+function toolButtonSpacer(){
+  toolbox.append(document.createTextNode(' - '))
+}
+
+toolButton("sidebar", "Toggle Sidebar [S]").onclick=toggleSidebarLeft
+toolButton("history", "Toggle History [Shift+S]").onclick=toggleSidebarRight
+toolButtonSpacer()
+
+for (let i of penTools) {
+  toolButton(i, toolTips[i]).onclick=function(){
+    if (penTool==i)
+      setPenTool("none")
+    else
+      setPenTool(i)
+  }
+}
+
+toolButton("gear", "More tools [Q]").onclick =toggleMoreControls
+
+toolButtonSpacer()
+toolButton("zoom100", "Zoom to 100% [Home]").onclick = zoomReset
+toolButton("zoomfit", "Zoom fit [End]").onclick = zoomFit
+toolButtonSpacer()
+toolButton("download", "Download JSON").onclick = downloadJson
+toolButton("help", "Help").onclick = openHelp
+
+;["addnote","marquee","pencil","line","arrow","rect","erase","gear"]
+  .forEach(b=>toolButtons[b].classList.add('ro-disable'))
+
+reloadAll()
+</script>
