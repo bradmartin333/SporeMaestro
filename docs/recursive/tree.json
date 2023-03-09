@@ -3,41 +3,279 @@
     "title": "Root",
     "children": [
       {
-        "id": 4,
-        "title": "Hardware\n",
-        "x": 170,
-        "y": 118,
-        "width": 200,
-        "height": 50,
+        "id": 6,
+        "title": "# Microscope\n\nTesting on a Swift SW380T",
+        "x": 741.8918334213101,
+        "y": 191.34835646926248,
+        "width": 325,
+        "height": 399,
         "color": {
-          "h": 180,
+          "h": 293.22203476039795,
           "s": 100,
-          "l": 62.96208591373526
+          "l": 76.72184563354614
+        },
+        "children": [
+          {
+            "id": 9,
+            "title": "LED Illuminator",
+            "x": 471,
+            "y": 505,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 50.100423728128234,
+              "s": 100,
+              "l": 50
+            },
+            "children": [
+              {
+                "id": 10,
+                "title": "Currently stock white LED, but have the supplies for a high-powered RGBW LED in my shop.",
+                "x": 118,
+                "y": 180,
+                "width": 228,
+                "height": 73,
+                "color": {
+                  "h": 300,
+                  "s": 100,
+                  "l": 73.64572525777967
+                },
+                "children": []
+              },
+              {
+                "id": 11,
+                "title": "Might take a shot at Fourier Ptychographic Microscopy",
+                "x": 492,
+                "y": 170,
+                "width": 201,
+                "height": 69,
+                "color": {
+                  "h": 274.4646878714705,
+                  "s": 100,
+                  "l": 79.50014822012925
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "title": "Diaphragm",
+            "x": 470,
+            "y": 442,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 180,
+              "s": 100,
+              "l": 62.90754489827373
+            },
+            "children": [
+              {
+                "id": 13,
+                "title": "Condenser",
+                "x": 371,
+                "y": 305,
+                "width": 200,
+                "height": 50,
+                "color": {
+                  "h": 90.92387773451054,
+                  "s": 100,
+                  "l": 50
+                },
+                "children": []
+              },
+              {
+                "id": 14,
+                "title": "Linearly polarized filter (Can move out of the way)",
+                "x": 369,
+                "y": 240,
+                "width": 200,
+                "height": 50,
+                "color": {
+                  "h": 45.04918567168068,
+                  "s": 100,
+                  "l": 51.65609271900784
+                },
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": 15,
+            "title": "Stage",
+            "x": 471,
+            "y": 376,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 300,
+              "s": 100,
+              "l": 72.66115279326173
+            },
+            "children": []
+          },
+          {
+            "id": 16,
+            "title": "Objective lens",
+            "x": 470,
+            "y": 310,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 248.18626967213942,
+              "s": 100,
+              "l": 82.77010372605362
+            },
+            "children": []
+          },
+          {
+            "id": 17,
+            "title": "Stationary linearly polarized filter",
+            "x": 472,
+            "y": 243,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 172.16289115472085,
+              "s": 100,
+              "l": 61.63910150719475
+            },
+            "children": []
+          },
+          {
+            "id": 18,
+            "title": "Ocular lens",
+            "x": 467,
+            "y": 175,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 84.35271311905356,
+              "s": 100,
+              "l": 50
+            },
+            "children": []
+          },
+          {
+            "id": 19,
+            "title": "Trinocular camera mount",
+            "x": 464,
+            "y": 108,
+            "width": 200,
+            "height": 50,
+            "color": {
+              "h": 36.5552797142637,
+              "s": 100,
+              "l": 59.699516181431456
+            },
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "# PC\n\nMain development is on Win10 as this PC has USB3 ports and the FLIR camera is my best option right now.\n\nAlso testing on Ubuntu running on an old MacBook Pro.",
+        "x": 1.6436912863398447,
+        "y": 190.0894310574683,
+        "width": 467,
+        "height": 401,
+        "color": {
+          "h": 184.34061761908194,
+          "s": 100,
+          "l": 65.44458568692937
         },
         "children": []
       },
       {
-        "id": 5,
-        "title": "Microscope",
-        "x": 409.34729483210265,
-        "y": 259.85719341129334,
-        "width": 200,
-        "height": 50,
+        "id": 8,
+        "title": "# Microcontroller\n\nCommunication using UDP\n\nCurrent go-to controller is the Arduino Portenta Machine Control\n\nMight get some Raspberry Pi Pico W boards to test out for simpler tasks",
+        "x": 487.5889002388884,
+        "y": 190.0894310574683,
+        "width": 239,
+        "height": 400,
         "color": {
-          "h": 91.09755514300444,
+          "h": 100.46280983379451,
           "s": 100,
-          "l": 50
+          "l": 54.76224132240478
         },
         "children": []
+      },
+      {
+        "id": 20,
+        "title": "# Camera\n\nCurrently supporting USB2, FLIR and MJPEG cameras\n\nOther USB3/GigE cameras (In addition to FLIR) can be added if necessary",
+        "x": 741.8918334213101,
+        "y": 39.01838164216824,
+        "width": 324,
+        "height": 139,
+        "color": {
+          "h": 333.9130434782609,
+          "s": 100,
+          "l": 72.94117647058823
+        },
+        "children": []
+      },
+      {
+        "id": 22,
+        "title": "# Gamepad\n\nRayLib makes it easy for gamepads to be used as input devices, and I plan to make good use of that!",
+        "x": 367.9909861184426,
+        "y": 54.12548658369831,
+        "width": 330,
+        "height": 95,
+        "color": {
+          "h": 154.9546928953148,
+          "s": 100,
+          "l": 61.698650056522
+        },
+        "children": [
+          {
+            "id": 23,
+            "title": "Testing with a Stadia controller flashed with the open-sourced Bluetooth firmware",
+            "x": 366,
+            "y": 148,
+            "width": 258,
+            "height": 69,
+            "color": {
+              "h": 77.2031358179613,
+              "s": 100,
+              "l": 50
+            },
+            "children": []
+          }
+        ]
       }
     ],
     "id": 2
   },
   "view": {
     "2": {
-      "x": 273.9953524980667,
-      "y": 70.64182368749277,
+      "x": 68.69436960208998,
+      "y": 51.006597788378144,
       "s": 0.7943282347242816,
+      "open": true
+    },
+    "6": {
+      "x": 0,
+      "y": 0,
+      "s": 1,
+      "open": true
+    },
+    "9": {
+      "x": 0,
+      "y": 0,
+      "s": 1,
+      "open": true
+    },
+    "12": {
+      "x": 0,
+      "y": 0,
+      "s": 1,
+      "open": true
+    },
+    "22": {
+      "x": 0,
+      "y": 0,
+      "s": 1,
       "open": true
     },
     "sidebarLeft": {
