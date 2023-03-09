@@ -464,6 +464,17 @@ window.onstorage=(e)=>{
   }
 }
 
+async function loadTree() {
+  let fileData = await fetch('./tree.json');
+  let jsonData = await fileData.json();
+  lastStorage = localStorage.tree;
+  localStorage.tree = JSON.stringify(jsonData.tree);
+  if (lastStorage != localStorage.tree) {
+    location.reload();
+  }
+}
+loadTree();
+
 function openHelp(){
   help.style.display='block'
 }
