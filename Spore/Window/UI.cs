@@ -6,19 +6,46 @@ namespace Window
 {
     public class UI
     {
-        public static unsafe void Main()
+        internal const int FONT_SIZE = 30;
+
+        private static Texture MakeBaseTexture(int wid, int hgt)
+        {
+            Random Random = new();
+            string[] loadingStrings = new string[] // Froms SIMS 2
+            {
+                "blurring reality lines",
+                "reticulating 3-dimensional splines",
+                "preparing captive simulators",
+                "capacitating genetic modifiers",
+                "destabilizing orbital payloads",
+                "manipulating modal memory",
+            };
+            string loadingString = loadingStrings[Random.Next(loadingStrings.Length)];
+            Image image = GenImageColor(wid, hgt, BLACK);
+            unsafe { ImageDrawText(&image, $"{loadingString}...", 10, hgt - FONT_SIZE - 10, FONT_SIZE, MAROON); }
+            return LoadTextureFromImage(image);
+        }
+
+        public static unsafe void Main(Color* ptr)
         {
             Log.Debug("Open Window");
             SetTraceLogLevel((int)TraceLogLevel.LOG_WARNING);
             SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
-            InitWindow(1280, 720, "Hello, Raylib-CsLo");
+            InitWindow(1280, 720, "Maestro");
             SetTargetFPS(60);
+
+            // Make base texture
+            int wid = GetRenderWidth();
+            int hgt = GetRenderHeight();
+            Texture texPattern = MakeBaseTexture(wid, hgt);
+            SetTextureFilter(texPattern, TextureFilter.TEXTURE_FILTER_BILINEAR);
+
             while (!WindowShouldClose()) // Detect window close button or ESC key
             {
                 BeginDrawing();
                 ClearBackground(SKYBLUE);
-                DrawFPS(10, 10);
-                DrawText("Raylib is easy!!!", 640, 360, 50, RED);
+                UpdateTexture(texPattern, ptr);
+                DrawTexture(texPattern, 0, 0, WHITE);
                 EndDrawing();
             }
             CloseWindow();
