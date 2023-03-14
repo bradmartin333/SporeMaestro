@@ -1,15 +1,17 @@
 ﻿using FlashCap;
+using System;
 
 namespace Camera
 {
-    internal class USB2Cam : ICamera
+    public class USB2Cam : ICamera
     {
-        internal List<(CaptureDeviceDescriptor, VideoCharacteristics)> Sources = new();
+        public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.MAX_WID * Config.MAX_HGT];
+        private readonly List<(CaptureDeviceDescriptor, VideoCharacteristics)> Sources = new();
         private CaptureDeviceDescriptor? Capture;
-        internal VideoCharacteristics? Characteristics;
+        private readonly VideoCharacteristics? Characteristics;
         private CaptureDevice? Device;
 
-        internal USB2Cam()
+        public USB2Cam()
         {
             CaptureDevices devices = new();
             foreach (CaptureDeviceDescriptor device in devices.EnumerateDescriptors())
@@ -22,10 +24,9 @@ namespace Camera
 
             if (Sources.Any())
             {
-                //Capture = Sources[workspace.CamIdx].Item1;
-                //Characteristics = Sources[workspace.CamIdx].Item2;
-
-                //Workspace?.SourceNames.AddRange(Sources.Select(x => x.Item1.Name).Where(x => !x.ToLower().Contains("default")));
+                Capture = Sources[0].Item1;
+                Characteristics = Sources[0].Item2;
+                Start();
             }
             else Console.WriteLine("No USB2 camera sources found");
         }
@@ -39,7 +40,7 @@ namespace Camera
         {
             try
             {
-                Device?.Stop();
+                Device?.StopAsync();
                 Capture = null;
             }
             catch (Exception)
@@ -55,7 +56,7 @@ namespace Camera
             try
             {
                 Device = await Capture.OpenAsync(Characteristics, OnPixelBufferArrivedAsync);
-                Device.Start();
+                await Device.StartAsync();
             }
             catch (Exception ex)
             {
@@ -67,9 +68,31 @@ namespace Camera
 
         private void OnPixelBufferArrivedAsync(PixelBufferScope bufferScope)
         {
-            //if (Workspace == null) return;
-            //Utilities.Imaging.NewUSB2(bufferScope.Buffer.ReferImage(), Workspace);
-            //Workspace.ColorsHaveUpdated = true;
+            // Unpack and resize image
+            Image<Rgba32> image = Image.Load<Rgba32>(bufferScope.Buffer.ReferImage());
+            image.Mutate(x => x.Resize(new ResizeOptions()
+            {
+                TargetRectangle = new(0, 0, Config.MAX_WID, Config.MAX_HGT),
+                Size = new(image.Width, image.Height),
+                Mode = ResizeMode.Pad,
+            }));
+
+            // Extract pixel array
+            Rgba32[] pixelArray = new Rgba32[image.Width * image.Height];
+            image.CopyPixelDataTo(pixelArray);
+
+            // Update window colors
+            int pixelIdx = 0;
+            for (int j = 0; j < image.Height; j++)
+            {
+                for (int i = 0; i < image.Width; i++)
+                {
+                    int idx = (j * image.Width) + i;
+                    Rgba32 pixel = pixelArray[pixelIdx];
+                    ProcessedColors[idx] = new Raylib_CsLo.Color(pixel.R, pixel.G, pixel.B, pixel.A);
+                    pixelIdx++;
+                }
+            }
         }
     }
 }

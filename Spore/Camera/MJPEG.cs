@@ -5,6 +5,8 @@
     /// </summary>
     internal class MJPEG : ICamera
     {
+        public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.MAX_WID * Config.MAX_HGT];
+
         // JPEG delimiters
         const byte PicMarker = 0xFF;
         const byte PicStart = 0xD8;

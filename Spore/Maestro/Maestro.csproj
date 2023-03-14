@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Camera\Camera.csproj" />
-    <ProjectReference Include="..\ImageProcessing\ImageProcessing.csproj" />
     <ProjectReference Include="..\Microcontroller\Microcontroller.csproj" />
     <ProjectReference Include="..\Window\Window.csproj" />
   </ItemGroup>

@@ -5,6 +5,8 @@ namespace Camera
 {
     internal class FLIR : ICamera
     {
+        public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.MAX_WID * Config.MAX_HGT];
+
         class ImageEventListener : ManagedImageEventHandler
         {
             readonly IManagedImageProcessor? Processor;

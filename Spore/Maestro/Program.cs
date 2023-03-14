@@ -29,6 +29,18 @@ internal class Program
         });
         window.Start();
 
+        // Init and poll camera's processed image
+        Camera.ICamera camera = new Camera.USB2Cam();
+        Thread cameraThread = new(() =>
+        {
+            camera.Start();
+            while (window.ThreadState != ThreadState.Stopped)
+            {
+                Array.Copy(camera.ProcessedColors, Colors, camera.ProcessedColors.Length);
+            }
+        });
+        cameraThread.Start();
+
         // Poll the console window
         while (window.ThreadState != ThreadState.Stopped)
         {
@@ -39,15 +51,6 @@ internal class Program
                 {
                     switch (s)
                     {
-                        case "r":
-                            Array.Fill(Colors, RED);
-                            break;
-                        case "g":
-                            Array.Fill(Colors, GREEN);
-                            break;
-                        case "b":
-                            Array.Fill(Colors, BLUE);
-                            break;
                         default:
                             break;
                     }

@@ -1,7 +1,7 @@
 ﻿using Serilog;
 using Raylib_CsLo;
-using static Raylib_CsLo.Raylib;
 using System.Numerics;
+using static Raylib_CsLo.Raylib;
 
 namespace Window
 {
@@ -47,10 +47,10 @@ namespace Window
                 BeginDrawing();
                 ClearBackground(SKYBLUE);
                 UpdateTexture(texPattern, ptr);
-                //DrawTexture(texPattern, 0, 0, WHITE);
-                DrawTextureNPatch(texPattern, ninePatchInfo, 
-                                  new Rectangle(0, 0, GetRenderWidth(), GetRenderHeight()), 
-                                  Vector2.Zero, 0f, WHITE);
+                DrawTexture(texPattern, 0, 0, WHITE);
+                //DrawTextureNPatch(texPattern, ninePatchInfo, 
+                //                  new Rectangle(0, 0, GetRenderWidth(), GetRenderHeight()), 
+                //                  Vector2.Zero, 0f, WHITE);
                 EndDrawing();
             }
             CloseWindow();

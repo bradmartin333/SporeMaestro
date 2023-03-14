@@ -8,7 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="FlashCap" Version="1.5.0" />
+    <PackageReference Include="Raylib-CsLo" Version="4.2.0.9" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImageProcessing\ImageProcessing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
