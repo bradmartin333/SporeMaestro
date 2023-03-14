@@ -29,10 +29,9 @@ internal class Program
         window.Start();
 
         // Init and poll camera's processed image
-        Camera.ICamera camera = new Camera.USB2Cam();
+        Camera.ICamera camera = new Camera.FLIR();
         Thread cameraThread = new(() =>
         {
-            camera.Start();
             while (window.ThreadState != ThreadState.Stopped)
             {
                 Array.Copy(camera.ProcessedColors, Colors, camera.ProcessedColors.Length);

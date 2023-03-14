@@ -72,8 +72,7 @@ namespace Camera
             Acquire.UpdateImage(image); // TESTING
             image.Mutate(x => x.Resize(new ResizeOptions()
             {
-                TargetRectangle = new(0, 0, Config.WID, Config.HGT),
-                Size = new(image.Width, image.Height),
+                Size = new(Config.WID, Config.HGT),
                 Mode = ResizeMode.Pad,
             }));
 

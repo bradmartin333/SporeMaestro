@@ -2,7 +2,7 @@
 {
     public class Config
     {
-        public static int WID { get; } = 2560;
-        public static int HGT { get; } = 1440;
+        public static int WID { get; } = 1280;
+        public static int HGT { get; } = 720;
     }
 }

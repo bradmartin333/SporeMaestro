@@ -18,10 +18,7 @@ namespace Window
             SetTargetFPS(60);
 
             // Make base texture
-            int wid = GetRenderWidth();
-            int hgt = GetRenderHeight();
-            float ratio = wid / (float)hgt;
-            Image image = GenImageColor(wid, hgt, BLACK);
+            Image image = GenImageColor(colorWid, colorHgt, MAROON);
             Texture texPattern = LoadTextureFromImage(image);
             SetTextureFilter(texPattern, TextureFilter.TEXTURE_FILTER_BILINEAR);
 
@@ -32,18 +29,10 @@ namespace Window
 
             while (!WindowShouldClose()) // Detect window close button or ESC key
             {
-                if (IsWindowResized())
-                {
-                    int thisWid = GetRenderWidth();
-                    int thisHgt = GetRenderHeight();    
-                    float ratioDiff = thisWid / (float)thisHgt - ratio;
-                    if (ratioDiff < 0) SetWindowSize(thisWid, (int)(thisWid / ratio));
-                    else if (ratioDiff > 0) SetWindowSize((int)(thisHgt * ratio), thisHgt);
-                }
                 BeginDrawing();
                 ClearBackground(BLACK);
                 UpdateTexture(texPattern, ptr);
-                DrawTextureEx(texPattern, new Vector2(0, TOOL_BOX_HGT), 0f, GetRenderWidth() / (float)colorWid + GetScreenHeight() / (float)colorHgt, WHITE);
+                DrawTexture(texPattern, 0, TOOL_BOX_HGT, WHITE);
                 EndDrawing();
             }
             CloseWindow();
