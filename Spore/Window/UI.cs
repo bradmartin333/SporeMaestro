@@ -7,12 +7,14 @@ namespace Window
 {
     public class UI
     {
+        private const int TOOL_BOX_HGT = 50;
+
         public static unsafe void Main(Color* ptr, int colorWid, int colorHgt)
         {
             Log.Debug("Open Window");
             SetTraceLogLevel((int)TraceLogLevel.LOG_WARNING);
             SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
-            InitWindow(1280, 720, "Maestro");
+            InitWindow(1280, 720 + TOOL_BOX_HGT, "Maestro");
             SetTargetFPS(60);
 
             // Make base texture
@@ -30,14 +32,13 @@ namespace Window
                     int thisWid = GetRenderWidth();
                     int thisHgt = GetRenderHeight();    
                     float ratioDiff = thisWid / (float)thisHgt - ratio;
-                    if (ratio != 0) Log.Verbose($"Adjusting window for difference of {ratioDiff}");
                     if (ratioDiff < 0) SetWindowSize(thisWid, (int)(thisWid / ratio));
                     else if (ratioDiff > 0) SetWindowSize((int)(thisHgt * ratio), thisHgt);
                 }
                 BeginDrawing();
-                ClearBackground(SKYBLUE);
+                ClearBackground(MAROON);
                 UpdateTexture(texPattern, ptr);
-                DrawTextureEx(texPattern, Vector2.Zero, 0f, GetRenderWidth() / (float)colorWid + GetScreenHeight() / (float)colorHgt, WHITE);
+                DrawTextureEx(texPattern, new Vector2(0, TOOL_BOX_HGT), 0f, GetRenderWidth() / (float)colorWid + GetScreenHeight() / (float)colorHgt, WHITE);
                 EndDrawing();
             }
             CloseWindow();

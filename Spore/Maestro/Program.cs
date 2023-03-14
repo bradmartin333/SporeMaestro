@@ -49,8 +49,11 @@ internal class Program
                 string? s = Reader.ReadLine(5000);
                 if (s != null)
                 {
-                    switch (s)
+                    switch (s.ToLower())
                     {
+                        case "clear":
+                            Console.Clear();
+                            break;
                         default:
                             break;
                     }
