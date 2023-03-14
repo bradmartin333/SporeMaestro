@@ -1,6 +1,7 @@
 ﻿namespace Camera
 {
     /// <summary>
+    /// TODO
     /// An amazingly simple implementation by Larry57 from 2015
     /// </summary>
     internal class MJPEG : ICamera
@@ -97,8 +98,7 @@
                 frameBuffer[frameIdx++] = current;
                 if (previous == PicMarker && current == PicEnd) // JPEG picture end ?
                 {
-                    //Utilities.Imaging.NewMJPEG(frameBuffer, Workspace);
-                    //Workspace.ColorsHaveUpdated = true;
+                    Image<Rgba32> image = Image.Load<Rgba32>(frameBuffer);
                     inPicture = false;
                     return;
                 }

@@ -1,10 +1,10 @@
 ﻿namespace ImageProcessing
 {
-    internal static class Focus
+    public static class Focus
     {
         private const int CLUSTER_SIZE = 10;
 
-        internal static float Process(ref Image<Rgba32> image, Rectangle r)
+        public static float Process(ref Image<Rgba32> image, Rectangle r)
         {
             float thisProcessingValue = -1f;
             int scanArea = CLUSTER_SIZE * CLUSTER_SIZE;

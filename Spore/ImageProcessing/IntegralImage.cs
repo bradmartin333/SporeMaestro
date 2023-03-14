@@ -8,7 +8,7 @@ namespace ImageProcessing
     /// <summary>
     /// Apply an image integral. <See href="https://en.wikipedia.org/wiki/Summed-area_table"/>
     /// </summary>
-    internal static partial class IntegralImage
+    public static partial class IntegralImage
     {
         /// <param name="source">The image on which to apply the integral.</param>
         /// <typeparam name="TPixel">The type of the pixel.</typeparam>

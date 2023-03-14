@@ -2,7 +2,7 @@
 {
     internal class Colorizer
     {
-        public static Color GetScoreColor(double score, double cutoff = 0.2)
+        internal static Color GetScoreColor(double score, double cutoff = 0.2)
         {
             if (score > cutoff) return Color.Transparent;
             else return HSL2RGB(score * (1 / cutoff), 0.5, 0.5);
@@ -10,7 +10,7 @@
 
         // Given H,S,L in range of 0-1
         // Returns a Color (RGB struct) in range of 0-255
-        public static Color HSL2RGB(double h, double sl, double l)
+        internal static Color HSL2RGB(double h, double sl, double l)
         {
             double v;
             double r, g, b;

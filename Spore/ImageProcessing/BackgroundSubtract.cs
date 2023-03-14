@@ -2,12 +2,12 @@
 
 namespace ImageProcessing
 {
-    internal static class BackgroundSubtract
+    public static class BackgroundSubtract
     {
         private const int CLUSTER_SIZE = 5;
         private const float THRESHOLD = 250.0f;
 
-        internal static float Process(ref Image<Rgba32> image, Rectangle r, Buffer2D<ulong> intImg, Buffer2D<ulong> lastIntImg)
+        public static float Process(ref Image<Rgba32> image, Rectangle r, Buffer2D<ulong> intImg, Buffer2D<ulong> lastIntImg)
         {
             float thisProcessingValue = -1f;
             image.ProcessPixelRows(accessor =>

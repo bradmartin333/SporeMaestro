@@ -69,6 +69,7 @@ namespace Camera
         {
             // Unpack and resize image
             Image<Rgba32> image = Image.Load<Rgba32>(bufferScope.Buffer.ReferImage());
+            Acquire.UpdateImage(image); // TESTING
             image.Mutate(x => x.Resize(new ResizeOptions()
             {
                 TargetRectangle = new(0, 0, Config.WID, Config.HGT),

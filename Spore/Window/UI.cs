@@ -41,7 +41,7 @@ namespace Window
                     else if (ratioDiff > 0) SetWindowSize((int)(thisHgt * ratio), thisHgt);
                 }
                 BeginDrawing();
-                ClearBackground(MAROON);
+                ClearBackground(BLACK);
                 UpdateTexture(texPattern, ptr);
                 DrawTextureEx(texPattern, new Vector2(0, TOOL_BOX_HGT), 0f, GetRenderWidth() / (float)colorWid + GetScreenHeight() / (float)colorHgt, WHITE);
                 EndDrawing();

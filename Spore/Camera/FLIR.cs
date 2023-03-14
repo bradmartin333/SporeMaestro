@@ -3,6 +3,9 @@ using SpinnakerNET.GenApi;
 
 namespace Camera
 {
+    /// <summary>
+    /// TODO
+    /// </summary>
     internal class FLIR : ICamera
     {
         public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.WID * Config.HGT];
@@ -25,9 +28,11 @@ namespace Camera
                     {
                         using IManagedImage convertedImage = Processor.Convert(raw, PixelFormatEnums.RGB8);
                         byte[] bytes = convertedImage.ManagedData;
-                        //Utilities.Imaging.NewFLIR(bytes, convertedImage.Width, convertedImage.Height, Workspace);
+                        Rgba32[] data = new Rgba32[Config.WID * Config.HGT];
+                        for (int i = 0; i < bytes.Length; i += 3)
+                            data[i / 3] = new Rgba32() { R = bytes[i], G = bytes[i + 1], B = bytes[i + 2], A = byte.MaxValue };
+                        Image<Rgba32> image = new(Configuration.Default, 10, 10); //Image.LoadPixelData(data, (int)wid, (int)hgt);
                         raw.Release();
-                        //Workspace.ColorsHaveUpdated = true;
                     }
                 }
                 catch (Exception)
