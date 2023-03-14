@@ -1,7 +1,6 @@
 ﻿namespace Camera
 {
     /// <summary>
-    /// TODO
     /// An amazingly simple implementation by Larry57 from 2015
     /// </summary>
     internal class MJPEG : ICamera

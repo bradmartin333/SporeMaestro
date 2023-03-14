@@ -4,9 +4,6 @@ using System.Security.Cryptography;
 
 namespace Camera
 {
-    /// <summary>
-    /// TODO
-    /// </summary>
     public class FLIR : ICamera
     {
         public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.WID * Config.HGT];
