@@ -11,7 +11,9 @@ internal class Program
         Logger.Initialize(); // Init Serilog
 
         // Allocate memory for the real-time image
-        Color[] Colors = new Color[Camera.Config.MAX_WID * Camera.Config.MAX_HGT]; // Pointer to the first element is used by Window
+        int colorWid = Camera.Config.MAX_WID;
+        int colorHgt = Camera.Config.MAX_HGT;
+        Color[] Colors = new Color[colorWid * colorHgt]; // Pointer to the first element is used by Window
 
         // Start the RayLib thread
         Thread window = new(() =>
@@ -20,7 +22,7 @@ internal class Program
             {
                 fixed (Color* colorPtr = &Colors[0])
                 {
-                    Window.UI.Main(colorPtr);
+                    Window.UI.Main(colorPtr, colorWid, colorHgt);
                     Console.WriteLine("*Exiting... have a good day!*");
                 }
             }

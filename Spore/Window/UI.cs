@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Raylib_CsLo;
 using static Raylib_CsLo.Raylib;
+using System.Numerics;
 
 namespace Window
 {
@@ -26,7 +27,7 @@ namespace Window
             return LoadTextureFromImage(image);
         }
 
-        public static unsafe void Main(Color* ptr)
+        public static unsafe void Main(Color* ptr, int colorWid, int colorHgt)
         {
             Log.Debug("Open Window");
             SetTraceLogLevel((int)TraceLogLevel.LOG_WARNING);
@@ -39,13 +40,17 @@ namespace Window
             int hgt = GetRenderHeight();
             Texture texPattern = MakeBaseTexture(wid, hgt);
             SetTextureFilter(texPattern, TextureFilter.TEXTURE_FILTER_BILINEAR);
+            NPatchInfo ninePatchInfo = new(new Rectangle(0, 0, colorWid, colorHgt), 16, 16, 16, 16, NPatchLayout.NPATCH_NINE_PATCH);
 
             while (!WindowShouldClose()) // Detect window close button or ESC key
             {
                 BeginDrawing();
                 ClearBackground(SKYBLUE);
                 UpdateTexture(texPattern, ptr);
-                DrawTexture(texPattern, 0, 0, WHITE);
+                //DrawTexture(texPattern, 0, 0, WHITE);
+                DrawTextureNPatch(texPattern, ninePatchInfo, 
+                                  new Rectangle(0, 0, GetRenderWidth(), GetRenderHeight()), 
+                                  Vector2.Zero, 0f, WHITE);
                 EndDrawing();
             }
             CloseWindow();
