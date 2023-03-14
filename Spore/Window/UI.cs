@@ -7,26 +7,6 @@ namespace Window
 {
     public class UI
     {
-        internal const int FONT_SIZE = 30;
-
-        private static Texture MakeBaseTexture(int wid, int hgt)
-        {
-            Random Random = new();
-            string[] loadingStrings = new string[] // Froms SIMS 2
-            {
-                "blurring reality lines",
-                "reticulating 3-dimensional splines",
-                "preparing captive simulators",
-                "capacitating genetic modifiers",
-                "destabilizing orbital payloads",
-                "manipulating modal memory",
-            };
-            string loadingString = loadingStrings[Random.Next(loadingStrings.Length)];
-            Image image = GenImageColor(wid, hgt, BLACK);
-            unsafe { ImageDrawText(&image, $"{loadingString}...", 10, hgt - FONT_SIZE - 10, FONT_SIZE, MAROON); }
-            return LoadTextureFromImage(image);
-        }
-
         public static unsafe void Main(Color* ptr, int colorWid, int colorHgt)
         {
             Log.Debug("Open Window");
@@ -38,19 +18,26 @@ namespace Window
             // Make base texture
             int wid = GetRenderWidth();
             int hgt = GetRenderHeight();
-            Texture texPattern = MakeBaseTexture(wid, hgt);
+            float ratio = wid / (float)hgt;
+            Image image = GenImageColor(wid, hgt, BLACK);
+            Texture texPattern = LoadTextureFromImage(image);
             SetTextureFilter(texPattern, TextureFilter.TEXTURE_FILTER_BILINEAR);
-            NPatchInfo ninePatchInfo = new(new Rectangle(0, 0, colorWid, colorHgt), 16, 16, 16, 16, NPatchLayout.NPATCH_NINE_PATCH);
 
             while (!WindowShouldClose()) // Detect window close button or ESC key
             {
+                if (IsWindowResized())
+                {
+                    int thisWid = GetRenderWidth();
+                    int thisHgt = GetRenderHeight();    
+                    float ratioDiff = thisWid / (float)thisHgt - ratio;
+                    if (ratio != 0) Log.Verbose($"Adjusting window for difference of {ratioDiff}");
+                    if (ratioDiff < 0) SetWindowSize(thisWid, (int)(thisWid / ratio));
+                    else if (ratioDiff > 0) SetWindowSize((int)(thisHgt * ratio), thisHgt);
+                }
                 BeginDrawing();
                 ClearBackground(SKYBLUE);
                 UpdateTexture(texPattern, ptr);
-                DrawTexture(texPattern, 0, 0, WHITE);
-                //DrawTextureNPatch(texPattern, ninePatchInfo, 
-                //                  new Rectangle(0, 0, GetRenderWidth(), GetRenderHeight()), 
-                //                  Vector2.Zero, 0f, WHITE);
+                DrawTextureEx(texPattern, Vector2.Zero, 0f, GetRenderWidth() / (float)colorWid + GetScreenHeight() / (float)colorHgt, WHITE);
                 EndDrawing();
             }
             CloseWindow();
