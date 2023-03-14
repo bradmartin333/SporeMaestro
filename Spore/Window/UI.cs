@@ -25,6 +25,11 @@ namespace Window
             Texture texPattern = LoadTextureFromImage(image);
             SetTextureFilter(texPattern, TextureFilter.TEXTURE_FILTER_BILINEAR);
 
+            // Icon
+            Image icon = LoadImage("logo.png");
+            ImageResize(&icon, icon.width / 30, icon.height / 30);
+            SetWindowIcon(icon);
+
             while (!WindowShouldClose()) // Detect window close button or ESC key
             {
                 if (IsWindowResized())

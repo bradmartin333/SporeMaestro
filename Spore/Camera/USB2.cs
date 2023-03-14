@@ -1,11 +1,10 @@
 ﻿using FlashCap;
-using System;
 
 namespace Camera
 {
     public class USB2Cam : ICamera
     {
-        public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.MAX_WID * Config.MAX_HGT];
+        public Raylib_CsLo.Color[] ProcessedColors { get; set; } = new Raylib_CsLo.Color[Config.WID * Config.HGT];
         private readonly List<(CaptureDeviceDescriptor, VideoCharacteristics)> Sources = new();
         private CaptureDeviceDescriptor? Capture;
         private readonly VideoCharacteristics? Characteristics;
@@ -72,7 +71,7 @@ namespace Camera
             Image<Rgba32> image = Image.Load<Rgba32>(bufferScope.Buffer.ReferImage());
             image.Mutate(x => x.Resize(new ResizeOptions()
             {
-                TargetRectangle = new(0, 0, Config.MAX_WID, Config.MAX_HGT),
+                TargetRectangle = new(0, 0, Config.WID, Config.HGT),
                 Size = new(image.Width, image.Height),
                 Mode = ResizeMode.Pad,
             }));

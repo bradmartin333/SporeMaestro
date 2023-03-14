@@ -1,6 +1,5 @@
 ﻿using Maestro;
 using Raylib_CsLo;
-using static Raylib_CsLo.Raylib;
 
 internal class Program
 {
@@ -11,8 +10,8 @@ internal class Program
         Logger.Initialize(); // Init Serilog
 
         // Allocate memory for the real-time image
-        int colorWid = Camera.Config.MAX_WID;
-        int colorHgt = Camera.Config.MAX_HGT;
+        int colorWid = Camera.Config.WID;
+        int colorHgt = Camera.Config.HGT;
         Color[] Colors = new Color[colorWid * colorHgt]; // Pointer to the first element is used by Window
 
         // Start the RayLib thread
